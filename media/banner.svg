@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E1B4B"/>
+      <stop offset="0.55" stop-color="#312E81"/>
+      <stop offset="1" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="spark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDE68A"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <circle cx="1130" cy="40" r="220" fill="#7C3AED" opacity="0.22"/>
+  <circle cx="120" cy="300" r="180" fill="#4F46E5" opacity="0.25"/>
+  <g transform="translate(88 92)">
+    <rect width="136" height="136" rx="30" fill="#FFFFFF" opacity="0.1"/>
+    <rect x="12" y="12" width="112" height="112" rx="24" fill="#FFFFFF" opacity="0.12"/>
+    <path d="M40 42v40a22 22 0 0 0 22 22h38" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="40" cy="34" r="10" fill="#FFFFFF"/>
+    <circle cx="40" cy="82" r="10" fill="#C7D2FE"/>
+    <circle cx="102" cy="104" r="10" fill="#FFFFFF"/>
+    <path d="M94 24l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" fill="url(#spark)"/>
+  </g>
+  <text x="270" y="150" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="700" fill="#FFFFFF">Commit Generator</text>
+  <text x="274" y="196" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" fill="#C7D2FE">AI commit messages from your staged diff.</text>
+  <text x="274" y="234" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#A5B4FC">Conventional Commits · Cloud and local models · Never commits</text>
+  <rect x="272" y="254" width="176" height="34" rx="17" fill="#FFFFFF" opacity="0.12"/>
+  <text x="292" y="276" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#E0E7FF">WebStorm · IntelliJ</text>
+</svg>

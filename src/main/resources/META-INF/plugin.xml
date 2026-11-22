@@ -1,0 +1,228 @@
+<idea-plugin>
+    <id>com.rajatmalik.commitgenerator</id>
+    <name>Commit Generator</name>
+    <version>1.0.0</version>
+    <vendor url="https://github.com/malikrajat">Rajat Malik</vendor>
+
+    <description><![CDATA[
+<h2>AI commit messages for JetBrains IDEs, built around your staged diff.</h2>
+<p>Commit Generator reads the changes you selected, asks your model for a Conventional Commit
+message, and writes it into the commit message field. You review, edit, and commit. It never
+commits for you.</p>
+
+<h3>What it does</h3>
+<ul>
+  <li>Generates one meaningful commit message from staged, unstaged, or untracked changes.</li>
+  <li>Works with OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter, Ollama,
+      LM Studio, llama.cpp, vLLM, OpenCode, and any OpenAI-compatible endpoint.</li>
+  <li>Supports multiple provider profiles and model discovery.</li>
+  <li>Quick, Smart, and Detailed generation modes, including token-budgeted map-reduce
+      analysis for large change sets.</li>
+  <li>Conventional Commits validation, optional body, breaking-change footers, issue keys,
+      output language, and repository style learning.</li>
+  <li>Shows exactly what will be sent, and reports every omitted or truncated file.</li>
+</ul>
+
+<h3>Trust and safety</h3>
+<ul>
+  <li><b>Never commits.</b> It only writes text into the commit message field.</li>
+  <li><b>Keys stay in the OS keychain</b> through JetBrains PasswordSafe, never in project
+      files or XML settings.</li>
+  <li><b>Secrets are redacted</b> before any request leaves the machine.</li>
+  <li><b>Sensitive paths are blocked</b> by default, with a one-run override.</li>
+  <li><b>No telemetry.</b> No analytics and no background network calls.</li>
+  <li><b>Local-only mode</b> rejects every non-loopback endpoint.</li>
+  <li><b>Diff content is data</b> and is never treated as instructions.</li>
+</ul>
+
+<p>Requires a JetBrains IDE with the bundled Git plugin. Works in WebStorm, IntelliJ IDEA,
+PhpStorm, PyCharm, GoLand, RubyMine, CLion, Rider, DataGrip, DataSpell, and RustRover.</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+<h3>1.0.0</h3>
+<ul>
+  <li>First release for JetBrains IDEs and WebStorm.</li>
+  <li>AI commit message generation from staged, unstaged, and untracked Git changes.</li>
+  <li>Eleven provider presets, multiple profiles, model discovery, and connection tests.</li>
+  <li>Quick, Smart, and Detailed modes with token budgeting and map-reduce summaries.</li>
+  <li>PasswordSafe credentials, secret redaction, sensitive-path blocking, consent tracking,
+      local-only mode, and payload preview.</li>
+  <li>Tool window, settings page, status bar widget, and commit-panel action.</li>
+</ul>
+    ]]></change-notes>
+
+    <idea-version since-build="241" until-build="263.*"/>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+    <depends>Git4Idea</depends>
+
+    <keywords>git,commit,commit message,commit message generator,commit generator,ai commit,ai commit message,
+        commit-gen,conventional commits,staged changes,diff,source control,scm,
+        openai,chatgpt,claude,anthropic,gemini,deepseek,openrouter,ollama,lm studio,llama.cpp,
+        vllm,opencode,local llm,offline,privacy,secure,password safe,no telemetry,jetbrains,
+        webstorm,intellij,webstorm plugin</keywords>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Commit Generator"
+                    anchor="right"
+                    icon="/icons/commit-generator.svg"
+                    factoryClass="com.rajatmalik.commitgenerator.ui.CommitGeneratorToolWindowFactory"
+                    canCloseContents="false"/>
+
+        <applicationConfigurable parentId="tools"
+                                 id="com.rajatmalik.commitgenerator.settings"
+                                 displayName="Commit Generator"
+                                 instance="com.rajatmalik.commitgenerator.config.CommitGeneratorConfigurable"/>
+
+        <notificationGroup id="Commit Generator Notifications"
+                           displayType="BALLOON"
+                           isLogByDefault="true"/>
+
+        <statusBarWidgetFactory id="CommitGeneratorStatus"
+                                implementation="com.rajatmalik.commitgenerator.ui.CommitGeneratorStatusBarFactory"/>
+    </extensions>
+
+    <actions>
+
+
+        <action id="CommitGenerator.Generate"
+                class="com.rajatmalik.commitgenerator.ui.actions.GenerateCommitMessageAction"
+                text="Generate Commit Message"
+                description="Generate a commit message from the selected Git changes"
+                icon="/icons/commit-generator.svg">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
+        </action>
+
+        <action id="CommitGenerator.GenerateStaged"
+                class="com.rajatmalik.commitgenerator.ui.actions.GenerateStagedCommitMessageAction"
+                text="Generate Commit Message (Staged Only)"
+                description="Generate a commit message from staged changes only"/>
+
+        <action id="CommitGenerator.Cancel"
+                class="com.rajatmalik.commitgenerator.ui.actions.CancelGenerationAction"
+                text="Cancel Generation"
+                description="Cancel an in-flight commit message generation"
+                icon="AllIcons.Actions.Suspend">
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="last"/>
+        </action>
+
+        <action id="CommitGenerator.Regenerate"
+                class="com.rajatmalik.commitgenerator.ui.actions.RegenerateCommitMessageAction"
+                text="Regenerate Commit Message"
+                description="Retry generation with the same change snapshot"/>
+        <action id="CommitGenerator.Undo"
+                class="com.rajatmalik.commitgenerator.ui.actions.UndoCommitMessageAction"
+                text="Undo Last Generated Message"
+                description="Restore the commit message that was present before generation"/>
+        <action id="CommitGenerator.PreviewPayload"
+                class="com.rajatmalik.commitgenerator.ui.actions.PreviewPayloadAction"
+                text="Preview Payload To Be Sent"
+                description="Inspect the redacted prompt that would be sent to the provider"/>
+        <action id="CommitGenerator.CopyLast"
+                class="com.rajatmalik.commitgenerator.ui.actions.CopyLastMessageAction"
+                text="Copy Last Generated Message"
+                description="Copy the last generated commit message to the clipboard"/>
+        <action id="CommitGenerator.OpenToolWindow"
+                class="com.rajatmalik.commitgenerator.ui.actions.OpenToolWindowAction"
+                text="Open Commit Generator"
+                description="Open the Commit Generator tool window"
+                icon="/icons/commit-generator.svg"/>
+        <action id="CommitGenerator.SelectRepository"
+                class="com.rajatmalik.commitgenerator.ui.actions.SelectRepositoryAction"
+                text="Select Repository"
+                description="Choose which open Git repository Commit Generator analyses"/>
+        <action id="CommitGenerator.ManageProfiles"
+                class="com.rajatmalik.commitgenerator.ui.actions.ManageProfilesAction"
+                text="Manage Provider Profiles"
+                description="Add, edit, remove, switch, and test provider profiles"/>
+        <action id="CommitGenerator.AddProfile"
+                class="com.rajatmalik.commitgenerator.ui.actions.AddProfileAction"
+                text="Add Provider Profile"
+                description="Create a provider profile"/>
+        <action id="CommitGenerator.EditProfile"
+                class="com.rajatmalik.commitgenerator.ui.actions.EditProfileAction"
+                text="Edit Provider Profile"
+                description="Edit the active provider profile"/>
+        <action id="CommitGenerator.RemoveProfile"
+                class="com.rajatmalik.commitgenerator.ui.actions.RemoveProfileAction"
+                text="Remove Provider Profile"
+                description="Remove a provider profile"/>
+        <action id="CommitGenerator.SelectProfile"
+                class="com.rajatmalik.commitgenerator.ui.actions.SelectProfileAction"
+                text="Select Provider Profile"
+                description="Switch the active provider profile"/>
+        <action id="CommitGenerator.SelectModel"
+                class="com.rajatmalik.commitgenerator.ui.actions.SelectModelAction"
+                text="Select Model"
+                description="Load models from the active provider and choose one"/>
+        <action id="CommitGenerator.TestConnection"
+                class="com.rajatmalik.commitgenerator.ui.actions.TestConnectionAction"
+                text="Test Provider Connection"
+                description="Check endpoint, credential, and model availability"/>
+        <action id="CommitGenerator.ValidateProfiles"
+                class="com.rajatmalik.commitgenerator.ui.actions.ValidateProfilesAction"
+                text="Validate Provider Configuration"
+                description="Validate every saved provider profile"/>
+        <action id="CommitGenerator.SetApiKey"
+                class="com.rajatmalik.commitgenerator.ui.actions.SetApiKeyAction"
+                text="Set API Key For Profile"
+                description="Store an API key in the OS keychain"/>
+        <action id="CommitGenerator.ClearApiKey"
+                class="com.rajatmalik.commitgenerator.ui.actions.ClearApiKeyAction"
+                text="Clear API Key For Profile"
+                description="Remove a stored API key"/>
+        <action id="CommitGenerator.AllowSensitiveOnce"
+                class="com.rajatmalik.commitgenerator.ui.actions.AllowSensitiveOnceAction"
+                text="Allow Sensitive Files For Next Generation"
+                description="Include sensitive paths for the next run only"/>
+        <action id="CommitGenerator.RevokeConsent"
+                class="com.rajatmalik.commitgenerator.ui.actions.RevokeConsentAction"
+                text="Revoke Egress Consent"
+                description="Clear stored network consent records"/>
+        <action id="CommitGenerator.ShowDiagnostics"
+                class="com.rajatmalik.commitgenerator.ui.actions.ShowDiagnosticsAction"
+                text="Show Diagnostics"
+                description="Show environment, Git, and provider details"/>
+        <action id="CommitGenerator.OpenSettings"
+                class="com.rajatmalik.commitgenerator.ui.actions.OpenSettingsAction"
+                text="Open Commit Generator Settings"
+                description="Open the Commit Generator settings page"/>
+
+        <group id="CommitGenerator.Menu"
+               text="Commit Generator"
+               description="AI commit message actions"
+               popup="true"
+               icon="/icons/commit-generator.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <reference ref="CommitGenerator.OpenToolWindow"/>
+            <separator/>
+            <reference ref="CommitGenerator.Generate"/>
+            <reference ref="CommitGenerator.GenerateStaged"/>
+            <reference ref="CommitGenerator.Cancel"/>
+            <separator/>
+            <reference ref="CommitGenerator.Regenerate"/>
+            <reference ref="CommitGenerator.Undo"/>
+            <reference ref="CommitGenerator.PreviewPayload"/>
+            <reference ref="CommitGenerator.CopyLast"/>
+            <separator/>
+            <reference ref="CommitGenerator.SelectRepository"/>
+            <reference ref="CommitGenerator.SelectProfile"/>
+            <reference ref="CommitGenerator.SelectModel"/>
+            <reference ref="CommitGenerator.ManageProfiles"/>
+            <reference ref="CommitGenerator.AddProfile"/>
+            <reference ref="CommitGenerator.EditProfile"/>
+            <reference ref="CommitGenerator.RemoveProfile"/>
+            <reference ref="CommitGenerator.TestConnection"/>
+            <reference ref="CommitGenerator.ValidateProfiles"/>
+            <reference ref="CommitGenerator.SetApiKey"/>
+            <reference ref="CommitGenerator.ClearApiKey"/>
+            <separator/>
+            <reference ref="CommitGenerator.AllowSensitiveOnce"/>
+            <reference ref="CommitGenerator.RevokeConsent"/>
+            <reference ref="CommitGenerator.ShowDiagnostics"/>
+            <reference ref="CommitGenerator.OpenSettings"/>
+        </group>
+    </actions>
+</idea-plugin>

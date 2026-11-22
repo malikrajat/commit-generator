@@ -1,0 +1,15 @@
+.gradle/
+build/
+out/
+.idea/
+.intellijPlatform/
+.kotlin/
+/*.zip
+*.iml
+*.ipr
+*.iws
+.DS_Store
+Thumbs.db
+local.properties
+.env
+*.log

@@ -1,0 +1,59 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Make wrapper executable
+        run: chmod +x gradlew
+
+      - name: Verify project configuration
+        run: ./gradlew verifyPluginProjectConfiguration --console=plain
+
+      - name: Run tests
+        run: ./gradlew test --console=plain
+
+      - name: Build plugin
+        run: ./gradlew buildPlugin --console=plain
+
+      - name: Upload plugin archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit-generator-plugin
+          path: build/distributions/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/tests
+          if-no-files-found: ignore
+          retention-days: 7
