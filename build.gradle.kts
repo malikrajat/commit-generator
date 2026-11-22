@@ -69,6 +69,7 @@ intellijPlatform {
             create(IntelliJPlatformType.WebStorm, "2025.1")
             create(IntelliJPlatformType.WebStorm, "2026.1")
             create(IntelliJPlatformType.WebStorm, "2026.3")
+            create(IntelliJPlatformType.IntellijIdea, "2026.3")
         }
     }
 

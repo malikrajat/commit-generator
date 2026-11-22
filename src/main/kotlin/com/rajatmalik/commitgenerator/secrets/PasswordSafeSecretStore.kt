@@ -33,5 +33,5 @@ class PasswordSafeSecretStore : SecretStorePort {
     override fun has(profileId: String, kind: SecretKind): Boolean = !get(profileId, kind).isNullOrEmpty()
 
     private fun attributes(profileId: String, kind: SecretKind): CredentialAttributes =
-        CredentialAttributes("${Product.CREDENTIAL_SERVICE}:$profileId", kind.key)
+        CredentialAttributesFactory.create("${Product.CREDENTIAL_SERVICE}:$profileId", kind.key)
 }

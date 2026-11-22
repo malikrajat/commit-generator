@@ -20,7 +20,7 @@ On Windows:
 .\gradlew.bat buildPlugin
 ```
 
-The installable ZIP is written to `build/distributions/commit-generator-1.0.0.zip`.
+The installable ZIP is written to `build/distributions/commit-generator-1.1.0.zip`.
 
 Run a development IDE:
 
@@ -98,7 +98,8 @@ patterns.
 - `buildSearchableOptions = false`: keeps CI fast and avoids launching the IDE.
 - Kotlin stdlib is supplied by the IDE, so it is not bundled.
 - The target platform is WebStorm 2024.1. The plugin uses only platform, VCS, and Git4Idea APIs.
-  Compatibility is verified against WebStorm 2024.1, 2025.1, 2026.1, and 2026.3.
+  Compatibility is verified against WebStorm 2024.1, 2025.1, 2026.1, 2026.3, and IntelliJ IDEA
+  2026.3.
 - `untilBuild` is intentionally capped. Raise it only after verification.
 
 ## Compatibility verification

@@ -14,7 +14,7 @@ Marketplace fields can be pasted without editing the technical documentation.
 | --- | --- |
 | Plugin name | `Commit Generator` |
 | Plugin ID | `com.rajatmalik.commitgenerator` |
-| Version | `1.0.0` |
+| Version | `1.1.0` |
 | Vendor | `Rajat Malik` |
 | Vendor URL | `https://github.com/malikrajat` |
 | Plugin home page | `https://github.com/malikrajat/commit-generator` |
@@ -29,7 +29,7 @@ Marketplace fields can be pasted without editing the technical documentation.
 | Release channel | `default` |
 | Since build | `241` (2024.1) |
 | Until build | `263.*` (2026.3) |
-| Plugin archive | `build/distributions/commit-generator-1.0.0.zip` |
+| Plugin archive | `build/distributions/commit-generator-1.1.0.zip` |
 | Plugin icon | `src/main/resources/META-INF/pluginIcon.svg` (archive), `media/plugin-icon.png` (Marketplace upload) |
 
 ## Short description
@@ -98,11 +98,11 @@ edit, and commit. It never commits for you.</p>
 
 <h3>Supported IDEs</h3>
 <p>WebStorm, IntelliJ IDEA, PhpStorm, PyCharm, GoLand, RubyMine, CLion, Rider, DataGrip,
-DataSpell, and RustRover 2024.1 or newer, with the bundled Git plugin enabled.</p>
+DataSpell, and RustRover 2024.1 through 2026.3, with the bundled Git plugin enabled.</p>
 
 <h3>Requirements</h3>
 <ul>
-  <li>WebStorm 2024.1+ or a compatible JetBrains IDE.</li>
+  <li>WebStorm 2024.1 through 2026.3, or a compatible JetBrains IDE in the same build range.</li>
   <li>The bundled Git plugin and an open Git repository.</li>
   <li>A provider account and API key, except for local servers.</li>
 </ul>
@@ -176,7 +176,7 @@ Select these products in the Marketplace compatibility matrix:
 
 The plugin does not require Java or Kotlin language plugins. It depends only on the platform,
 VCS, and bundled Git plugin. The plugin verifier reports compatibility with WebStorm 2024.1,
-2025.1, 2026.1, and 2026.3.
+2025.1, 2026.1, and 2026.3, plus IntelliJ IDEA 2026.3.
 
 ## Screenshots
 
@@ -197,6 +197,20 @@ images at 1440x900 or larger, PNG, under 5 MB each.
 Do not include real API keys, private repository names, customer code, or personal data in
 screenshots. Use a synthetic demo repository.
 
+## Release notes for 1.1.0
+
+```html
+<h3>1.1.0</h3>
+<ul>
+  <li>Redesigned the tool window with full-width sections, consistent left alignment,
+      and controls that stay inside the window at every width.</li>
+  <li>Improved the provider, repository, message options, privacy, and latest-message
+      sections, with clearer actions and responsive button rows.</li>
+  <li>Polished the settings page and provider profile dialogs.</li>
+  <li>Verified from WebStorm 2024.1 through WebStorm 2026.3, plus IntelliJ IDEA 2026.3.</li>
+</ul>
+```
+
 ## Release notes for 1.0.0
 
 ```html
@@ -215,13 +229,13 @@ screenshots. Use a synthetic demo repository.
 ## Upload checklist
 
 1. Confirm `gradle.properties` and `src/main/resources/META-INF/plugin.xml` both say
-   `1.0.0`.
+   `1.1.0`.
 2. Run `.\gradlew.bat clean test buildPlugin`.
 3. Run `.\gradlew.bat verifyPluginProjectConfiguration`.
 4. Optionally run `.\gradlew.bat verifyPlugin` and fix any reported compatibility problems.
 5. Sign the ZIP with `.\gradlew.bat signPlugin` if you have JetBrains signing certificates.
 6. Open <https://plugins.jetbrains.com/author/me> and choose **Upload plugin**.
-7. Upload `build/distributions/commit-generator-1.0.0.zip`.
+7. Upload `build/distributions/commit-generator-1.1.0.zip`.
 8. Paste the name, short description, full description, tags, category, vendor, and URLs
    from this document.
 9. Upload `media/plugin-icon.png` as the plugin icon if the portal asks separately (the plugin

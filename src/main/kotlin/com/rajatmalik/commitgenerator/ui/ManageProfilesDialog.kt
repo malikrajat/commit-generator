@@ -103,14 +103,28 @@ class ManageProfilesDialog(
             add(javax.swing.Box.createVerticalGlue())
             add(closeButton)
         }
-        val footer = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
+        buttons.components.filterIsInstance<JButton>().forEach { button ->
+            button.alignmentX = java.awt.Component.LEFT_ALIGNMENT
+            button.maximumSize = Dimension(JBUI.scale(150), button.preferredSize.height)
+        }
+        val header = JPanel(BorderLayout(0, 3)).apply {
+            isOpaque = false
+            add(JBLabel("Provider profiles"), BorderLayout.NORTH)
+            add(
+                JBLabel("Choose a profile, then edit it or set its OS keychain credential."),
+                BorderLayout.CENTER,
+            )
+        }
+        val footer = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
+            isOpaque = false
             add(JBLabel("Credentials live in the OS keychain. Commit Generator never stages or commits."))
         }
         val center = JPanel(BorderLayout(0, 8)).apply {
             border = JBUI.Borders.empty(8)
+            add(header, BorderLayout.NORTH)
             add(JBScrollPane(list), BorderLayout.CENTER)
             add(footer, BorderLayout.SOUTH)
-            preferredSize = Dimension(820, 460)
+            preferredSize = Dimension(760, 460)
         }
         return JPanel(BorderLayout()).apply {
             add(center, BorderLayout.CENTER)

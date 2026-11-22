@@ -6,6 +6,7 @@ Maintainer checklist for publishing Commit Generator.
 
 1. Update the version in:
    - `gradle.properties` (`pluginVersion`)
+   - `src/main/kotlin/com/rajatmalik/commitgenerator/core/Product.kt` (`VERSION`)
    - `src/main/resources/META-INF/plugin.xml` (`<version>`)
    - `CHANGELOG.md`
 2. Update `MARKETPLACE.md` release notes if the listing copy changed.
@@ -25,22 +26,23 @@ Optional compatibility verification:
 .\gradlew.bat verifyPlugin
 ```
 
-The build verifies against WebStorm 2024.1, 2025.1, 2026.1, and 2026.3. Add newer IDEs to
+The build verifies against WebStorm 2024.1, 2025.1, 2026.1, and 2026.3, plus IntelliJ IDEA
+Community 2026.3 to prove the plugin is product-neutral. Add newer IDEs to
 `build.gradle.kts` before raising the until-build range.
 
 The archive is written to:
 
 ```
-build/distributions/commit-generator-1.0.0.zip
+build/distributions/commit-generator-1.1.0.zip
 ```
 
 A ready-to-upload copy is also placed at the repository root as
-`commit-generator-1.0.0.zip`.
+`commit-generator-1.1.0.zip`.
 
 Inspect the archive:
 
 ```powershell
-Expand-Archive build\distributions\commit-generator-1.0.0.zip -DestinationPath build\release-check
+Expand-Archive build\distributions\commit-generator-1.1.0.zip -DestinationPath build\release-check
 Get-ChildItem build\release-check -Recurse
 ```
 
@@ -82,7 +84,7 @@ If you prefer the web UI:
 
 1. Open <https://plugins.jetbrains.com/author/me>.
 2. Choose **Upload plugin**.
-3. Upload `build/distributions/commit-generator-1.0.0.zip`.
+3. Upload `build/distributions/commit-generator-1.1.0.zip`.
 4. Copy the fields from `MARKETPLACE.md`.
 5. Upload screenshots.
 6. Select compatible products and the build range.

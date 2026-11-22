@@ -199,7 +199,7 @@ Each invariant has an automated check in `src/test/kotlin/.../architecture` or a
 - No streaming UI: simpler, cancellable, avoids fighting the commit field.
 - No automatic commit: the core safety promise.
 - No Git shell execution: read-only Git4Idea commands keep behavior predictable.
-- No proxy integration in 1.0: use a local model or a reachable endpoint.
+- No proxy integration: use a local model or a reachable endpoint.
 - No runtime JSON library: the small parser is tested and keeps the plugin archive small.
 - Kotlin standard library is provided by the IDE, not bundled.
 - Target range is capped at 2026.3 until newer releases are verified.

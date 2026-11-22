@@ -1,44 +1,63 @@
 package com.rajatmalik.commitgenerator.ui
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.util.IconLoader
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.JBColor
 import com.intellij.util.ui.JBUI
 import com.rajatmalik.commitgenerator.core.Product
 import com.rajatmalik.commitgenerator.core.domain.GenerationMode
-import com.rajatmalik.commitgenerator.core.domain.OverwriteDraft
 import com.rajatmalik.commitgenerator.services.CommitGeneratorProjectService
 import com.rajatmalik.commitgenerator.services.GenerationController
 import com.rajatmalik.commitgenerator.services.commitGeneratorProject
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
+import java.awt.Font
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
+import java.awt.Rectangle
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
-import javax.swing.Box
-import javax.swing.BoxLayout
+import javax.swing.BorderFactory
 import javax.swing.DefaultListCellRenderer
+import javax.swing.Icon
 import javax.swing.JButton
+import javax.swing.JComponent
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JSeparator
+import javax.swing.Scrollable
 import javax.swing.SwingConstants
 
+/**
+ * Main tool window.
+ *
+ * The layout deliberately uses a single full-width grid. Every section is
+ * stretched to the viewport width, every label and checkbox is left aligned,
+ * and action rows are split into small groups so controls cannot escape the
+ * window at narrow widths. The content panel tracks the viewport width, which
+ * keeps the tool window usable in both the narrow right sidebar and a wide
+ * detached window.
+ */
 class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(BorderLayout()), Disposable {
     private val service: CommitGeneratorProjectService = commitGeneratorProject(project)
     private val controller: GenerationController = service.generationController
     private val settings = service.app.settings
 
-    private val providerValue = JBLabel()
-    private val repositoryValue = JBLabel()
-    private val statusValue = JBLabel()
+    private val providerValue = valueLabel(bold = true)
+    private val providerDetail = hintLabel()
+    private val repositoryValue = valueLabel(bold = false)
+    private val statusValue = hintLabel()
     private val modeCombo = enumCombo(GenerationMode.entries) { it.title }
     private val staged = JBCheckBox("Staged changes")
     private val unstaged = JBCheckBox("Unstaged changes")
@@ -51,14 +70,14 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
     private val timeoutField = JBTextField()
     private val languageField = JBTextField()
     private val messageArea = JBTextArea()
-    private val statsLabel = JBLabel()
+    private val statsLabel = hintLabel()
     private val warningsArea = JBTextArea()
     private val generateButton = JButton("Generate commit message")
     private val generateStagedButton = JButton("Staged only")
     private val cancelButton = JButton("Cancel")
     private val regenerateButton = JButton("Regenerate")
     private val undoButton = JButton("Undo")
-    private val previewButton = JButton("Preview payload")
+    private val previewButton = JButton("Preview")
     private val copyButton = JButton("Copy")
     private val insertButton = JButton("Insert")
     private val detailsButton = JButton("Details")
@@ -89,197 +108,149 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
 
     private fun buildUi() {
         add(header(), BorderLayout.NORTH)
-        add(JBScrollPane(content()).apply {
-            border = JBUI.Borders.empty()
-            horizontalScrollBarPolicy = javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-            verticalScrollBar.unitIncrement = 16
-        }, BorderLayout.CENTER)
+        add(
+            JBScrollPane(content()).apply {
+                border = JBUI.Borders.empty()
+                horizontalScrollBarPolicy = javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+                verticalScrollBar.unitIncrement = 16
+                viewport.isOpaque = false
+                isOpaque = false
+            },
+            BorderLayout.CENTER,
+        )
     }
 
     private fun header(): JPanel {
-        val title = JBLabel("<html><span style='font-size:16px;font-weight:600'>${Product.NAME}</span></html>")
-        val subtitle = JBLabel(
-            "<html>AI commit messages from your changes. Review, then commit yourself. " +
-                "Commit Generator never stages or commits.</html>",
-        )
-        subtitle.foreground = JBColor.GRAY
-        val heading = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        val title = JBLabel(Product.NAME).apply {
+            font = JBUI.Fonts.label().deriveFont(Font.BOLD, 17f)
+            horizontalAlignment = SwingConstants.LEFT
+            minimumSize = Dimension(0, 0)
+            toolTipText = Product.DESCRIPTION
+        }
+        val subtitle = hintLabel("AI commit messages from your checked changes.")
+        val subtitle2 = hintLabel("Review, then commit. Nothing is staged automatically.")
+        val text = StackPanel()
+            .row(title)
+            .row(subtitle, 3)
+            .row(subtitle2, 1)
+
+        val icon = productIcon()
+        val heading = JPanel(BorderLayout(10, 0)).apply {
             isOpaque = false
-            add(title)
-            add(Box.createVerticalStrut(3))
-            add(subtitle)
+            if (icon != null) {
+                add(JBLabel(icon).apply { verticalAlignment = SwingConstants.TOP }, BorderLayout.WEST)
+            }
+            add(text, BorderLayout.CENTER)
         }
         val inner = JPanel(BorderLayout()).apply {
-            border = JBUI.Borders.empty(12, 14, 10, 14)
+            border = JBUI.Borders.empty(12, 14, 11, 14)
+            isOpaque = false
             add(heading, BorderLayout.CENTER)
         }
-        val outer = JPanel(BorderLayout()).apply {
+        return JPanel(BorderLayout()).apply {
+            isOpaque = false
             add(inner, BorderLayout.CENTER)
             add(JSeparator(), BorderLayout.SOUTH)
         }
-        return outer
     }
 
-    private fun content(): JPanel {
-        val content = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = JBUI.Borders.empty(10, 12, 16, 12)
-            isOpaque = false
+    private fun content(): JComponent {
+        val content = ContentPanel()
+        content.border = JBUI.Borders.empty(12, 12, 18, 12)
+
+        content.addCard(providerCard(), 0)
+        content.addCard(repositoryCard(), 10)
+        content.addCard(changesCard(), 10)
+        content.addCard(messageCard(), 10)
+        content.addCard(privacyCard(), 10)
+
+        generateButton.apply {
+            font = JBUI.Fonts.label().deriveFont(Font.BOLD, 13f)
+            toolTipText = "Analyse the files checked in the Commit panel, or the selected change sources."
+            addActionListener {
+                persistMessageFields()
+                controller.generate(DataContext.EMPTY_CONTEXT)
+            }
         }
-
-        content.add(card(
-            "Provider",
-            "Choose the profile used for the next generation.",
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(providerValue)
-                add(Box.createVerticalStrut(6))
-                add(buttonRow(
-                    "Switch" to { controller.selectProfile() },
-                    "Add" to { controller.addProfile() },
-                    "Manage" to { controller.manageProfiles() },
-                    "Test" to { controller.testConnection() },
-                    "Validate" to { controller.validateProfiles() },
-                    "Set key" to { controller.setApiKey() },
-                ))
-            },
-        ))
-        content.add(Box.createVerticalStrut(10))
-
-        content.add(card(
-            "Repository",
-            "Read-only Git access. The selected change sources are analysed.",
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(repositoryValue)
-            },
-        ))
-        content.add(Box.createVerticalStrut(10))
-
-        content.add(card(
-            "What to analyse",
-            "Only selected changes are read. Nothing is sent until you generate.",
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(staged)
-                add(unstaged)
-                add(untracked)
-                add(Box.createVerticalStrut(4))
-                add(buttonRow(
-                    "Switch repo" to { controller.selectRepository() },
-                    "Refresh repository" to { refresh() },
-                    "Allow sensitive once" to { controller.allowSensitiveOnce() },
-                ))
-            },
-        ))
-        content.add(Box.createVerticalStrut(10))
-
-        content.add(card(
-            "Message",
-            "Depth, limits and formatting for the generated message.",
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(labelled("Mode", modeCombo))
-                add(labelled("Max diff tokens", budgetField))
-                add(labelled("Max files", maxFilesField))
-                add(labelled("Timeout (ms)", timeoutField))
-                add(labelled("Language", languageField))
-                add(Box.createVerticalStrut(4))
-                add(conventional)
-                add(includeBody)
-            },
-        ))
-        content.add(Box.createVerticalStrut(10))
-
-        content.add(card(
-            "Privacy",
-            "Control what may leave this machine.",
-            JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                add(localOnly)
-                add(Box.createVerticalStrut(4))
-                add(buttonRow(
-                    "Revoke consent" to { controller.revokeConsent() },
-                    "Diagnostics" to { controller.showDiagnostics() },
-                ))
-            },
-        ))
-        content.add(Box.createVerticalStrut(12))
-
-        generateButton.addActionListener {
-            persistMessageFields()
-            controller.generate(com.intellij.openapi.actionSystem.DataContext.EMPTY_CONTEXT)
-        }
-        generateStagedButton.addActionListener {
-            persistMessageFields()
-            controller.generate(com.intellij.openapi.actionSystem.DataContext.EMPTY_CONTEXT, stagedOnly = true)
-        }
-        cancelButton.addActionListener { controller.cancel() }
-        regenerateButton.addActionListener { controller.regenerate() }
-        undoButton.addActionListener { controller.undoLast() }
-        previewButton.addActionListener { controller.showPreview() }
-        copyButton.addActionListener { controller.copyLast() }
-        insertButton.addActionListener { controller.insertLast() }
-        detailsButton.addActionListener { controller.showLastDetails() }
-
-        val generateRow = JPanel(BorderLayout(6, 0)).apply {
-            isOpaque = false
-            add(generateButton, BorderLayout.CENTER)
-            add(generateStagedButton, BorderLayout.EAST)
-        }
-        content.add(generateRow)
-        content.add(Box.createVerticalStrut(6))
-        val actionRow = JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply { isOpaque = false }
-        actionRow.add(cancelButton)
-        actionRow.add(regenerateButton)
-        actionRow.add(undoButton)
-        actionRow.add(previewButton)
-        actionRow.add(JButton("Settings").apply { addActionListener { controller.openSettings() } })
-        content.add(actionRow)
-        content.add(Box.createVerticalStrut(12))
+        content.row(generateButton, 14)
+        content.row(
+            buttonRow(
+                generateStagedButton,
+                cancelButton,
+                undoButton,
+            ),
+            7,
+        )
+        content.row(
+            buttonRow(
+                regenerateButton,
+                previewButton,
+            ),
+            6,
+        )
+        content.row(buttonRow(settingsButton()), 6)
 
         messageArea.apply {
             isEditable = false
             lineWrap = true
             wrapStyleWord = true
-            rows = 8
+            rows = 7
             font = JBUI.Fonts.create("JetBrains Mono", 12)
-            border = JBUI.Borders.empty(6)
+            border = JBUI.Borders.empty(8)
         }
         warningsArea.apply {
             isEditable = false
             lineWrap = true
             wrapStyleWord = true
-            rows = 3
+            rows = 2
             foreground = JBColor(0xB26B00, 0xE0A030)
-            border = JBUI.Borders.empty(2, 6, 4, 6)
             isOpaque = false
+            border = JBUI.Borders.empty()
+            isVisible = false
         }
         statsLabel.foreground = JBColor.GRAY
         statusValue.foreground = JBColor.GRAY
 
-        val resultPanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            add(JBScrollPane(messageArea).apply { preferredSize = Dimension(520, 190) })
-            add(Box.createVerticalStrut(6))
-            add(statsLabel)
-            add(warningsArea)
-            add(Box.createVerticalStrut(6))
-            val resultActions = JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply { isOpaque = false }
-            resultActions.add(copyButton)
-            resultActions.add(insertButton)
-            resultActions.add(detailsButton)
-            add(resultActions)
-            add(Box.createVerticalStrut(4))
-            add(statusValue)
+        val resultActions = buttonRow(copyButton, insertButton, detailsButton)
+        val resultBody = StackPanel()
+            .row(
+                JBScrollPane(messageArea).apply {
+                    preferredSize = Dimension(400, 170)
+                    minimumSize = Dimension(0, 120)
+                    border = BorderFactory.createLineBorder(JBColor.border())
+                    horizontalScrollBarPolicy = javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+                },
+                8,
+            )
+            .row(statsLabel, 6)
+            .row(warningsArea, 4)
+            .row(resultActions, 6)
+            .row(statusValue, 6)
+        content.addCard(card("Latest message", "Review before inserting into the commit field.", resultBody), 12)
+        content.row(
+            StackPanel()
+                .row(hintLabel("Keys stay in the OS keychain. No telemetry."))
+                .row(hintLabel("Nothing is staged or committed automatically."), 2),
+            12,
+        )
+
+        generateStagedButton.apply {
+            toolTipText = "Generate from staged changes only, ignoring the Commit panel selection."
+            addActionListener {
+                persistMessageFields()
+                controller.generate(DataContext.EMPTY_CONTEXT, stagedOnly = true)
+            }
         }
-        content.add(card("Latest message", "Review and edit before committing.", resultPanel))
-        content.add(Box.createVerticalStrut(10))
-        content.add(JBLabel(
-            "<html><span style='color:gray'>Keys stay in the OS keychain. No telemetry. " +
-                "No automatic commits.</span></html>",
-        ).apply { horizontalAlignment = SwingConstants.LEFT })
+        cancelButton.addActionListener { controller.cancel() }
+        regenerateButton.addActionListener { controller.regenerate() }
+        undoButton.addActionListener { controller.undoLast() }
+        previewButton.apply {
+            toolTipText = "Preview the redacted payload that would be sent."
+            addActionListener { controller.showPreview() }
+        }
+        copyButton.addActionListener { controller.copyLast() }
+        insertButton.addActionListener { controller.insertLast() }
+        detailsButton.addActionListener { controller.showLastDetails() }
 
         staged.addActionListener { persistSelection() }
         unstaged.addActionListener { persistSelection() }
@@ -315,52 +286,110 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
         return content
     }
 
-    private fun card(title: String, description: String, body: JPanel): JPanel {
-        val head = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+    private fun providerCard(): JPanel {
+        val body = StackPanel()
+            .row(providerValue)
+            .row(providerDetail, 2)
+            .row(
+                buttonRow(
+                    actionButton("Switch") { controller.selectProfile() },
+                    actionButton("Add") { controller.addProfile() },
+                    actionButton("Manage") { controller.manageProfiles() },
+                ),
+                9,
+            )
+            .row(
+                buttonRow(
+                    actionButton("Test") { controller.testConnection() },
+                    actionButton("Validate") { controller.validateProfiles() },
+                    actionButton("Set key") { controller.setApiKey() },
+                ),
+                5,
+            )
+        return card("Provider", "Profile used for the next generation.", body)
+    }
+
+    private fun repositoryCard(): JPanel {
+        val body = StackPanel()
+            .row(repositoryValue)
+            .row(
+                buttonRow(
+                    actionButton("Switch repo") { controller.selectRepository() },
+                    actionButton("Refresh") { refresh() },
+                ),
+                9,
+            )
+        return card("Repository", "Read-only Git access.", body)
+    }
+
+    private fun changesCard(): JPanel {
+        val body = StackPanel()
+            .row(initCheckBox(staged, "Include changes staged in the Git index."))
+            .row(initCheckBox(unstaged, "Include working-tree changes, including conflicts."), 4)
+            .row(initCheckBox(untracked, "Include files that Git does not track yet."), 4)
+        return card("Changes to include", "Only the selected sources are analysed.", body)
+    }
+
+    private fun messageCard(): JPanel {
+        val form = FormPanel()
+            .field("Mode", modeCombo)
+            .field("Max diff tokens", budgetField)
+            .field("Max files", maxFilesField)
+            .field("Timeout (ms)", timeoutField)
+            .field("Language", languageField)
+            .check(conventional, 9)
+            .check(includeBody, 4)
+        return card("Message options", "Depth, limits, and formatting.", form)
+    }
+
+    private fun privacyCard(): JPanel {
+        val body = StackPanel()
+            .row(initCheckBox(localOnly, "Reject every non-loopback provider endpoint."))
+            .row(
+                buttonRow(
+                    actionButton("Allow sensitive once") { controller.allowSensitiveOnce() },
+                    actionButton("Diagnostics") { controller.showDiagnostics() },
+                ),
+                9,
+            )
+            .row(buttonRow(actionButton("Revoke consent") { controller.revokeConsent() }), 5)
+        return card("Privacy", "Control what may leave this machine.", body)
+    }
+
+    private fun card(title: String, description: String, body: JComponent): JPanel {
+        val head = StackPanel()
+            .row(JBLabel(title).apply {
+                font = JBUI.Fonts.label().deriveFont(Font.BOLD, 13f)
+                horizontalAlignment = SwingConstants.LEFT
+                minimumSize = Dimension(0, 0)
+            })
+            .row(hintLabel(description), 2)
+        val inner = JPanel(BorderLayout(0, 8)).apply {
+            border = JBUI.Borders.empty(10, 12, 12, 12)
             isOpaque = false
-            add(JBLabel("<html><b>$title</b></html>"))
-            add(JBLabel("<html><span style='color:gray;font-size:11px'>$description</span></html>"))
-        }
-        val inner = JPanel(BorderLayout(0, 6)).apply {
-            border = JBUI.Borders.empty(9, 10, 10, 10)
             add(head, BorderLayout.NORTH)
             add(body, BorderLayout.CENTER)
         }
         return JPanel(BorderLayout()).apply {
             border = JBUI.Borders.customLine(JBColor.border(), 1)
             add(inner, BorderLayout.CENTER)
-            maximumSize = Dimension(Int.MAX_VALUE, Int.MAX_VALUE)
-            alignmentX = LEFT_ALIGNMENT
         }
     }
 
-    private fun labelled(label: String, field: JBTextField): JPanel {
-        field.columns = 18
-        return JPanel(BorderLayout(8, 0)).apply {
-            isOpaque = false
-            border = JBUI.Borders.emptyBottom(4)
-            add(JBLabel(label), BorderLayout.WEST)
-            add(field, BorderLayout.CENTER)
-            maximumSize = Dimension(Int.MAX_VALUE, 30)
-        }
+    private fun initCheckBox(box: JBCheckBox, tooltip: String): JBCheckBox = box.apply {
+        horizontalAlignment = SwingConstants.LEFT
+        toolTipText = tooltip
     }
 
-    private fun labelled(label: String, combo: ComboBox<*>): JPanel = JPanel(BorderLayout(8, 0)).apply {
-        isOpaque = false
-        border = JBUI.Borders.emptyBottom(4)
-        add(JBLabel(label), BorderLayout.WEST)
-        add(combo, BorderLayout.CENTER)
-        maximumSize = Dimension(Int.MAX_VALUE, 30)
+    private fun actionButton(text: String, action: () -> Unit): JButton = JButton(text).apply {
+        addActionListener { action() }
     }
 
-    private fun buttonRow(vararg buttons: Pair<String, () -> Unit>): JPanel {
-        val row = JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply { isOpaque = false }
-        for ((text, action) in buttons) {
-            row.add(JButton(text).apply {
-                addActionListener { action() }
-            })
-        }
+    private fun settingsButton(): JButton = actionButton("Settings") { controller.openSettings() }
+
+    private fun buttonRow(vararg buttons: JButton): JPanel {
+        val row = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0)).apply { isOpaque = false }
+        buttons.forEach(row::add)
         return row
     }
 
@@ -413,16 +442,25 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
         try {
             val config = settings.read()
             val active = service.activeProfile()
-            providerValue.text = if (active == null) {
-                if (service.profiles().isEmpty()) {
-                    "No provider configured. Add one to begin."
+            if (active == null) {
+                providerValue.text = if (service.profiles().isEmpty()) {
+                    "No provider configured"
                 } else {
-                    "No active provider. Choose one to begin."
+                    "No active provider"
+                }
+                providerDetail.text = if (service.profiles().isEmpty()) {
+                    "Add a profile to begin."
+                } else {
+                    "Choose a profile to begin."
                 }
             } else {
-                "${active.label}  ·  ${active.provider.label}  ·  ${active.model}"
+                providerValue.text = active.label
+                providerDetail.text = "${active.provider.label} / ${active.model}"
             }
+            providerValue.toolTipText = providerValue.text
+            providerDetail.toolTipText = providerDetail.text
             repositoryValue.text = service.repositoryLabel()
+            repositoryValue.toolTipText = repositoryValue.text
             modeCombo.item = config.mode
             staged.isSelected = config.context.includeStaged
             unstaged.isSelected = config.context.includeUnstaged
@@ -451,13 +489,14 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
             if (messageArea.text.isBlank()) {
                 statsLabel.text = "No message generated yet."
                 warningsArea.text = ""
-                statusValue.text = if (generating) "Generating…" else ""
+                warningsArea.isVisible = false
+                statusValue.text = if (generating) "Generating..." else ""
             } else {
                 val prepared = service.lastResult?.prepared
                 statsLabel.text = if (outcome != null && prepared != null) {
-                    "${prepared.changeSet.counts.files} file(s) · ${prepared.mode.id.title} · " +
-                        "~${prepared.plan.estimatedTokens} tokens · ${outcome.durationMs} ms" +
-                        if (prepared.plan.omitted.isNotEmpty()) " · ${prepared.plan.omitted.size} omitted" else ""
+                    "${prepared.changeSet.counts.files} file(s) \u00B7 ${prepared.mode.id.title} \u00B7 " +
+                        "~${prepared.plan.estimatedTokens} tokens \u00B7 ${outcome.durationMs} ms" +
+                        if (prepared.plan.omitted.isNotEmpty()) " \u00B7 ${prepared.plan.omitted.size} omitted" else ""
                 } else {
                     "Generated message"
                 }
@@ -466,14 +505,17 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
                     outcome?.summary?.limitations?.forEach { add("Limitation: $it") }
                 }
                 warningsArea.text = notes.joinToString("\n")
+                warningsArea.isVisible = notes.isNotEmpty()
                 statusValue.text = when {
-                    generating -> "Generating…"
+                    generating -> "Generating..."
                     service.lastResult?.writtenToCommitPanel == true -> "Inserted into the commit message field."
-                    else -> "Ready in Commit Generator. Open the Commit tool window and choose Insert, or copy it."
+                    else -> "Ready. Open the Commit panel and choose Insert, or copy the message."
                 }
             }
         } finally {
             refreshing = false
+            revalidate()
+            repaint()
         }
     }
 
@@ -495,6 +537,149 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
         }
         return combo
     }
+
+    private fun productIcon(): Icon? = runCatching {
+        IconLoader.getIcon("/icons/commit-generator.svg", javaClass)
+    }.getOrNull()
+
+    private fun valueLabel(bold: Boolean): JBLabel = JBLabel().apply {
+        horizontalAlignment = SwingConstants.LEFT
+        minimumSize = Dimension(0, 0)
+        if (bold) {
+            font = JBUI.Fonts.label().deriveFont(Font.BOLD, 13f)
+        }
+    }
+
+    private fun hintLabel(text: String = ""): JBLabel = JBLabel(text).apply {
+        horizontalAlignment = SwingConstants.LEFT
+        foreground = JBColor.GRAY
+        font = JBUI.Fonts.label().deriveFont(11f)
+        minimumSize = Dimension(0, 0)
+    }
+}
+
+/**
+ * Vertical stack that always stretches its children to the full width. This
+ * replaces BoxLayout, whose per-component alignment is the reason checkboxes
+ * and labels drifted to the middle or right of the old tool window.
+ */
+private class StackPanel : JPanel(GridBagLayout()) {
+    private var nextRow = 0
+
+    init {
+        isOpaque = false
+    }
+
+    fun row(component: JComponent, topGap: Int = 0): StackPanel {
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = nextRow++
+            weightx = 1.0
+            weighty = 0.0
+            fill = GridBagConstraints.HORIZONTAL
+            anchor = GridBagConstraints.NORTHWEST
+            insets = Insets(JBUI.scale(topGap), 0, 0, 0)
+        }
+        add(component, constraints)
+        return this
+    }
+}
+
+/**
+ * Two-column form with a stable label column and a field column that absorbs
+ * all remaining width. Labels never move the fields around, and the fields
+ * cannot grow past the card boundary.
+ */
+private class FormPanel : JPanel(GridBagLayout()) {
+    private var nextRow = 0
+
+    init {
+        isOpaque = false
+    }
+
+    fun field(label: String, component: JComponent): FormPanel {
+        val caption = JBLabel(label).apply {
+            horizontalAlignment = SwingConstants.LEFT
+            minimumSize = Dimension(0, 0)
+            labelFor = component
+        }
+        val captionConstraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = nextRow
+            weightx = 0.0
+            weighty = 0.0
+            fill = GridBagConstraints.NONE
+            anchor = GridBagConstraints.WEST
+            insets = Insets(JBUI.scale(7), 0, 0, JBUI.scale(8))
+        }
+        val fieldConstraints = GridBagConstraints().apply {
+            gridx = 1
+            gridy = nextRow++
+            weightx = 1.0
+            weighty = 0.0
+            fill = GridBagConstraints.HORIZONTAL
+            anchor = GridBagConstraints.WEST
+            insets = Insets(JBUI.scale(7), 0, 0, 0)
+        }
+        add(caption, captionConstraints)
+        add(component, fieldConstraints)
+        return this
+    }
+
+    fun check(component: JComponent, topGap: Int): FormPanel {
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = nextRow++
+            gridwidth = 2
+            weightx = 1.0
+            weighty = 0.0
+            fill = GridBagConstraints.HORIZONTAL
+            anchor = GridBagConstraints.WEST
+            insets = Insets(JBUI.scale(topGap), 0, 0, 0)
+        }
+        add(component, constraints)
+        return this
+    }
+}
+
+/**
+ * Scrollable content that follows the viewport width and only scrolls
+ * vertically. Without this, Swing keeps the content's preferred width and the
+ * horizontal scrollbar (or clipped controls) appears in narrow tool windows.
+ */
+private class ContentPanel : JPanel(GridBagLayout()), Scrollable {
+    private var nextRow = 0
+
+    init {
+        isOpaque = false
+    }
+
+    fun row(component: JComponent, topGap: Int = 0): ContentPanel {
+        val constraints = GridBagConstraints().apply {
+            gridx = 0
+            gridy = nextRow++
+            weightx = 1.0
+            weighty = 0.0
+            fill = GridBagConstraints.HORIZONTAL
+            anchor = GridBagConstraints.NORTHWEST
+            insets = Insets(JBUI.scale(topGap), 0, 0, 0)
+        }
+        add(component, constraints)
+        return this
+    }
+
+    fun addCard(component: JComponent, topGap: Int): ContentPanel = row(component, topGap)
+
+    override fun getPreferredScrollableViewportSize(): Dimension = preferredSize
+
+    override fun getScrollableUnitIncrement(visibleRect: Rectangle, orientation: Int, direction: Int): Int = 16
+
+    override fun getScrollableBlockIncrement(visibleRect: Rectangle, orientation: Int, direction: Int): Int =
+        if (orientation == SwingConstants.VERTICAL) visibleRect.height else visibleRect.width
+
+    override fun getScrollableTracksViewportWidth(): Boolean = true
+
+    override fun getScrollableTracksViewportHeight(): Boolean = false
 }
 
 /**

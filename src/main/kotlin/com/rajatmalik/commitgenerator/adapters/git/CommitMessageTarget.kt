@@ -33,15 +33,17 @@ import java.util.IdentityHashMap
  */
 class CommitMessageTarget private constructor(
     private val target: CommitMessageI,
-    private val readCurrent: () -> String?,
+    private val readMessage: () -> String?,
 ) : MessageWriterPort {
 
     override fun isAvailable(): Boolean = true
 
-    override fun readCurrent(): String? = onEdt { readCurrent() }
+    // The lambda must not share this method's name: Kotlin would resolve the
+    // call to this override and recurse until the stack overflows.
+    override fun readCurrent(): String? = onEdt { readMessage() }
 
     override fun write(message: String, policy: WritePolicy): WriteOutcome = onEdt {
-        val previous = readCurrent() ?: ""
+        val previous = readMessage() ?: ""
         val next = if (policy == WritePolicy.APPEND && previous.trim().isNotEmpty()) {
             "${previous.trimEnd()}\n\n${message.trim()}"
         } else {

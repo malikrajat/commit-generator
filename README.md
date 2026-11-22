@@ -91,13 +91,31 @@ Read the full [security policy](SECURITY.md) and [privacy statement](PRIVACY.md)
 
 ## Requirements
 
-- WebStorm 2024.1 or newer (build 241+), or a compatible JetBrains IDE.
-  Verified with WebStorm 2024.1, 2025.1, 2026.1, and 2026.3.
+- WebStorm 2024.1 through 2026.3 (builds 241 through 263.*), or a compatible JetBrains IDE
+  in the same build range. Verified with WebStorm 2024.1, 2025.1, 2026.1, and 2026.3,
+  plus IntelliJ IDEA 2026.3.
 - The bundled **Git** plugin enabled.
 - A Git repository opened in the IDE.
 - Network access to your provider, or a local Ollama / LM Studio / llama.cpp / vLLM /
   OpenCode server.
 - A provider account and API key, except for local servers.
+
+### Compatibility range
+
+The plugin declares `since-build="241"` and `until-build="263.*"`, which means:
+
+- **Supported:** every JetBrains IDE release from **2024.1 (241)** through **2026.3
+  (263.*)**, including all patch builds in those release branches. Your WebStorm
+  `WS-263.7307.202` is a 2026.3 build, so it is inside the range.
+- **Not supported:** releases older than 2024.1, and releases newer than 2026.3
+  (for example a future 2026.4 / 264 build) until the upper bound is raised and verified.
+- The `241` and `263` values are release branches, not a specific IDE installation or
+  product ID. The same numeric build exists across WebStorm, IntelliJ IDEA, PhpStorm,
+  and the other JetBrains IDEs.
+
+It is not WebStorm-only. The plugin depends only on the platform, VCS, and bundled Git
+plugin, so it loads in any IntelliJ Platform IDE that ships Git. The 1.1.0 build is
+verified against WebStorm 2024.1, 2025.1, 2026.1, 2026.3, and IntelliJ IDEA 2026.3.
 
 ## Installation
 
@@ -112,19 +130,18 @@ Read the full [security policy](SECURITY.md) and [privacy statement](PRIVACY.md)
 1. Build the plugin with `.\gradlew.bat buildPlugin` or download a release.
 2. Open **Settings | Plugins**.
 3. Click the gear icon and choose **Install Plugin from Disk...**.
-4. Select `commit-generator-1.0.0.zip`.
+4. Select `commit-generator-1.1.0.zip`.
 5. Restart the IDE.
 
 A ready-to-upload copy of the archive is also placed at the repository root as
-`commit-generator-1.0.0.zip`.
+`commit-generator-1.1.0.zip`.
 
 ## Quick start
 
 1. Open a Git repository in WebStorm or another JetBrains IDE.
-2. Stage the files you want to commit. In IntelliJ-based IDEs this means adding them to the
-   Git index: either enable the Git staging area in **Settings | Version Control | Git**, or
-   run `git add` in a terminal. Unstaged changes are also enabled by default, so ticking
-   files in the Commit panel works without staging them.
+2. Check the files you want to commit in the **Commit** panel. No staging step is required:
+   Commit Generator uses the checked files directly. Unstaged changes are also enabled by
+   default when you start from the tool window.
 3. Open the **Commit Generator** tool window on the right side, or run
    **Commit Generator: Manage Provider Profiles** from **Find Action**.
 4. Add a provider, enter the API key, and choose a model.
