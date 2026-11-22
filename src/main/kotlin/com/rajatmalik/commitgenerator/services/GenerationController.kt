@@ -18,6 +18,8 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.util.ExceptionUtil
 import com.rajatmalik.commitgenerator.adapters.git.CommitMessageTarget
+import com.rajatmalik.commitgenerator.adapters.git.CommitSelection
+import com.rajatmalik.commitgenerator.adapters.git.commitSelectionFrom
 import com.rajatmalik.commitgenerator.adapters.git.GitCommandRunner
 import com.rajatmalik.commitgenerator.adapters.git.GitDiffCollector
 import com.rajatmalik.commitgenerator.adapters.git.GitPortAdapter
@@ -69,7 +71,26 @@ class GenerationController(
     private val app: CommitGeneratorApplicationService
         get() = state.app
 
-    fun generate(dataContext: DataContext?, stagedOnly: Boolean = false) {
+    fun generate(dataContext: DataContext?, stagedOnly: Boolean = false, useAllPending: Boolean = false) {
+        val actionTarget = CommitMessageTarget.fromDataContext(dataContext)
+        val initialTarget = actionTarget ?: locateTarget()
+        val explicitSelection = if (stagedOnly || useAllPending) {
+            null
+        } else {
+            commitSelectionFrom(dataContext)
+                ?: initialTarget?.dataContext()?.let(::commitSelectionFrom)
+        }
+        if (explicitSelection != null && explicitSelection.absolutePaths.isEmpty()) {
+            info(
+                "No files are checked in the Commit panel.",
+                actions = listOf(
+                    "Analyze all pending changes" to { analyzeAllPendingChanges() },
+                    "Open Settings" to { openSettings() },
+                ),
+            )
+            return
+        }
+
         if (!state.beginGeneration()) {
             info("Generation already in progress.")
             return
@@ -87,14 +108,13 @@ class GenerationController(
             return
         }
         val config = app.settings.read()
-        val selection = if (stagedOnly) {
-            ContextSelection(includeStaged = true, includeUnstaged = false, includeUntracked = false)
-        } else {
-            config.context.selection()
+        val selection = when {
+            useAllPending -> ContextSelection(includeStaged = true, includeUnstaged = true, includeUntracked = true)
+            stagedOnly -> ContextSelection(includeStaged = true, includeUnstaged = false, includeUntracked = false)
+            else -> config.context.selection()
         }
         val allowSensitive = state.allowSensitiveNext
         state.allowSensitiveNext = false
-        val actionTarget = CommitMessageTarget.fromDataContext(dataContext)
 
         val task = object : Task.Backgroundable(project, "${Product.NAME}: generating commit message", true) {
             override fun run(indicator: ProgressIndicator) {
@@ -108,11 +128,17 @@ class GenerationController(
                     val repo = repoContext(repository)
                     val prepared = app.generation.prepare(
                         repo,
-                        PrepareOptions(config, profile, selection, allowSensitive),
+                        PrepareOptions(
+                            config,
+                            profile,
+                            selection,
+                            allowSensitive,
+                            explicitSelection?.absolutePaths,
+                        ),
                         token,
                     )
                     if (prepared is CwResult.Err) {
-                        handleError(prepared.error, repository, null, actionTarget)
+                        handleError(prepared.error, repository, null, initialTarget)
                         return
                     }
                     if (!ensureConsent(prepared.valueUnsafe(), token)) {
@@ -126,12 +152,12 @@ class GenerationController(
                         indicator.text = progressText(progress)
                     }
                     if (outcome is CwResult.Err) {
-                        handleError(outcome.error, repository, prepared.valueUnsafe(), actionTarget)
+                        handleError(outcome.error, repository, prepared.valueUnsafe(), initialTarget)
                         return
                     }
                     indicator.fraction = 0.95
                     indicator.text = "Writing commit message..."
-                    writeResult(repository, outcome.valueUnsafe(), prepared.valueUnsafe(), actionTarget ?: locateTarget())
+                    writeResult(repository, outcome.valueUnsafe(), prepared.valueUnsafe(), initialTarget)
                 } catch (error: Throwable) {
                     handleThrowable(error)
                 } finally {
@@ -141,6 +167,17 @@ class GenerationController(
             }
         }
         ProgressManager.getInstance().run(task)
+    }
+
+    private fun analyzeAllPendingChanges() {
+        app.settings.update {
+            it.includeStaged = true
+            it.includeUnstaged = true
+            it.includeUntracked = true
+        }
+        ApplicationManager.getApplication().invokeLater {
+            generate(null, useAllPending = true)
+        }
     }
 
     fun regenerate(dataContext: DataContext? = null) {
@@ -192,7 +229,14 @@ class GenerationController(
         ProgressManager.getInstance().run(task)
     }
 
-    fun showPreview() {
+    fun showPreview(dataContext: DataContext? = null) {
+        val initialTarget = CommitMessageTarget.fromDataContext(dataContext) ?: locateTarget()
+        val explicitSelection = commitSelectionFrom(dataContext)
+            ?: initialTarget?.dataContext()?.let(::commitSelectionFrom)
+        if (explicitSelection != null && explicitSelection.absolutePaths.isEmpty()) {
+            info("No files are checked in the Commit panel.")
+            return
+        }
         if (!state.beginGeneration()) {
             info("A generation is already in progress.")
             return
@@ -215,11 +259,17 @@ class GenerationController(
                     indicator.text = "Collecting changes..."
                     val prepared = app.generation.prepare(
                         repoContext(repository),
-                        PrepareOptions(config, profile, config.context.selection(), false),
+                        PrepareOptions(
+                            config,
+                            profile,
+                            config.context.selection(),
+                            false,
+                            explicitSelection?.absolutePaths,
+                        ),
                         token,
                     )
                     if (prepared is CwResult.Err) {
-                        handleError(prepared.error, repository, null, null)
+                        handleError(prepared.error, repository, null, initialTarget)
                         return
                     }
                     val value = prepared.valueUnsafe()
@@ -695,7 +745,7 @@ class GenerationController(
                             )
                             state.notifyUi()
                             warning(
-                                "Generated message kept in CommitGenerator. The existing draft was not changed.",
+                                "Generated message kept in Commit Generator. The existing draft was not changed.",
                                 "Use Insert, Copy, or Discard from the Commit Generator tool window.",
                             )
                             return
@@ -723,7 +773,7 @@ class GenerationController(
                 repository.root.path, written.previous, outcome, prepared, false,
             )
             state.notifyUi()
-            error(written.failure ?: "Could not write to the commit message field. The message is available in CommitGenerator.")
+            error(written.failure ?: "Could not write to the commit message field. The message is available in Commit Generator.")
             return
         }
 
@@ -814,13 +864,7 @@ class GenerationController(
             ErrorCode.NO_CHANGES -> info(
                 error.message,
                 listOf(
-                    "Analyze unstaged changes" to {
-                        app.settings.update {
-                            it.includeStaged = true
-                            it.includeUnstaged = true
-                        }
-                        ApplicationManager.getApplication().invokeLater { generate(null) }
-                    },
+                    "Analyze all pending changes" to { analyzeAllPendingChanges() },
                     "Open Settings" to { openSettings() },
                 ),
             )
@@ -913,6 +957,8 @@ class GenerationController(
             return
         }
         app.logger.error("unexpected generation failure", mapOf("type" to error.javaClass.simpleName))
+        com.intellij.openapi.diagnostic.Logger.getInstance("Commit Generator")
+            .error("Unexpected generation failure", error)
         val details = buildString {
             append("Unexpected error\n\n")
             append("Type: ${error.javaClass.name}\n")

@@ -69,6 +69,8 @@ data class PrepareOptions(
     val profile: ProviderProfile,
     val selection: ContextSelection,
     val allowSensitive: Boolean,
+    /** Absolute paths checked in the Commit panel, or null for toggle-driven selection. */
+    val explicitPaths: Set<String>? = null,
 )
 
 data class PreparedGeneration(
@@ -116,7 +118,7 @@ class GenerateCommitMessageService(private val deps: GenerateServiceDeps) {
         val profile = effective.valueUnsafe()
         val config = options.config
 
-        if (!options.selection.hasSelection()) {
+        if (options.explicitPaths == null && !options.selection.hasSelection()) {
             return err(
                 appError(
                     ErrorCode.CONFIG,
@@ -148,6 +150,7 @@ class GenerateCommitMessageService(private val deps: GenerateServiceDeps) {
                 maxFileBytes = config.context.maxFileBytes,
                 excludeGlobs = config.context.excludeGlobs,
                 allowSensitive = options.allowSensitive,
+                explicitPaths = options.explicitPaths,
             ),
             signal,
         )
@@ -156,13 +159,14 @@ class GenerateCommitMessageService(private val deps: GenerateServiceDeps) {
         }
         val changeSet = collected.valueUnsafe()
         if (changeSet.files.isEmpty()) {
-            val scopeText = if (options.selection.includeStaged &&
-                !options.selection.includeUnstaged &&
-                !options.selection.includeUntracked
-            ) {
-                "No staged changes to describe."
-            } else {
-                "No changed files to describe."
+            val scopeText = when {
+                options.explicitPaths != null ->
+                    "No changed files were found for the selection in the Commit panel."
+                options.selection.includeStaged &&
+                    !options.selection.includeUnstaged &&
+                    !options.selection.includeUntracked ->
+                    "No staged changes to describe."
+                else -> "No changed files to describe."
             }
             val omissionText = if (changeSet.omitted.isNotEmpty()) {
                 " ${changeSet.omitted.size} file${if (changeSet.omitted.size == 1) " was" else "s were"} " +

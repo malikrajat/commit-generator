@@ -36,11 +36,10 @@ The three toggles are independent:
 - **Unstaged changes** reads the working tree, including merge conflicts.
 - **Untracked files** reads files Git does not track yet.
 
-In classic JetBrains commit workflows, changes are not staged first. Either:
-
-- enable the Git staging area in **Settings | Version Control | Git**, or
-- run `git add` in a terminal, or
-- enable **Unstaged changes** in Commit Generator.
+In classic JetBrains commit workflows, changes are not staged first. Commit Generator uses the
+files checked in the Commit panel automatically. If you start from the tool window with the
+Commit panel closed, unstaged changes are enabled by default, or you can run `git add`/enable
+the Git staging area to use the index only.
 
 If a path has both staged and unstaged edits and both toggles are enabled, Commit Generator asks
 Git for the combined `HEAD` diff, so the message describes the whole change.
@@ -93,7 +92,10 @@ Undo restores the text that was present before the write.
 
 ### "No staged changes"
 
-Stage files with `git add`, enable the Git staging area, or enable **Unstaged changes**.
+Commit Generator reads the files checked in the Commit panel when launched from there. If you
+start from the tool window instead, enable **Unstaged changes** or use **Analyze all pending
+changes** in the notification. **Generate Commit Message (Staged Only)** always reads the Git
+index.
 
 ### The message is generated but not inserted
 

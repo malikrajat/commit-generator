@@ -86,7 +86,7 @@ class CommitGeneratorSettings : PersistentStateComponent<CommitGeneratorSettings
         var mode: String = GenerationMode.SMART.key
 
         var includeStaged: Boolean = true
-        var includeUnstaged: Boolean = false
+        var includeUnstaged: Boolean = true
         var includeUntracked: Boolean = false
         var maxDiffTokens: Int = 12_000
         var maxFiles: Int = 200

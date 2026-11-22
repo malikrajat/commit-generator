@@ -51,6 +51,11 @@ data class CollectorOptions(
     val maxFileBytes: Int,
     val excludeGlobs: List<String>,
     val allowSensitive: Boolean,
+    /**
+     * Absolute paths checked in the Commit panel. When present, these override
+     * the staged/unstaged/untracked toggles and are diffed against HEAD.
+     */
+    val explicitPaths: Set<String>? = null,
 )
 
 interface DiffCollector {

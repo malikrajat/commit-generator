@@ -105,3 +105,39 @@ fun selectEntries(entries: List<GitStatusEntry>, selection: ContextSelection): L
 
     return selected.values.sortedBy { it.entry.path }
 }
+
+/**
+ * Selection driven by the files checked in the Commit panel. The paths are
+ * absolute; each matched path is diffed against HEAD so both staged and
+ * unstaged edits are included.
+ */
+fun selectExplicitEntries(
+    entries: List<GitStatusEntry>,
+    explicitPaths: Set<String>,
+    repoRoot: String,
+): List<SelectedGitEntry> {
+    val root = java.nio.file.Paths.get(repoRoot).toAbsolutePath().normalize()
+    val relative = explicitPaths.mapNotNull { raw ->
+        val path = runCatching { java.nio.file.Paths.get(raw) }.getOrNull() ?: return@mapNotNull null
+        val normalized = path.toAbsolutePath().normalize()
+        if (normalized.startsWith(root)) {
+            root.relativize(normalized).toString().replace('\\', '/')
+        } else if (!path.isAbsolute) {
+            raw.replace('\\', '/')
+        } else {
+            null
+        }
+    }.toSet()
+
+    return entries.mapNotNull { entry ->
+        if (entry.path !in relative && entry.oldPath !in relative) {
+            return@mapNotNull null
+        }
+        val mode = when {
+            entry.untracked -> DiffMode.UNTRACKED
+            entry.conflicted -> DiffMode.WORKING
+            else -> DiffMode.HEAD
+        }
+        SelectedGitEntry(entry, mode)
+    }.sortedBy { it.entry.path }
+}

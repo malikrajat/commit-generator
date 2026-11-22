@@ -23,7 +23,7 @@
     <path d="M94 24l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" fill="url(#spark)"/>
   </g>
   <text x="270" y="150" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="58" font-weight="700" fill="#FFFFFF">Commit Generator</text>
-  <text x="274" y="196" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" fill="#C7D2FE">AI commit messages from your staged diff.</text>
+  <text x="274" y="196" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" fill="#C7D2FE">AI commit messages from your checked changes.</text>
   <text x="274" y="234" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#A5B4FC">Conventional Commits · Cloud and local models · Never commits</text>
   <rect x="272" y="254" width="176" height="34" rx="17" fill="#FFFFFF" opacity="0.12"/>
   <text x="292" y="276" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#E0E7FF">WebStorm · IntelliJ</text>

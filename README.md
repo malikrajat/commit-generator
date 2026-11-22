@@ -2,7 +2,7 @@
 
 ![Commit Generator](media/banner.png)
 
-**AI commit messages for WebStorm and JetBrains IDEs, built around your staged diff.**
+**AI commit messages for WebStorm and JetBrains IDEs, built around the files you check in the Commit panel.**
 
 Commit Generator reads the changes you selected, asks your model for a Conventional Commit
 message, and writes it into the IDE commit message field. You review, edit, and commit.
@@ -121,8 +121,8 @@ A ready-to-upload copy of the archive is also placed at the repository root as
 1. Open a Git repository in WebStorm or another JetBrains IDE.
 2. Stage the files you want to commit. In IntelliJ-based IDEs this means adding them to the
    Git index: either enable the Git staging area in **Settings | Version Control | Git**, or
-   run `git add` in a terminal. If you do not use staging, enable **Unstaged changes** in the
-   Commit Generator tool window.
+   run `git add` in a terminal. Unstaged changes are also enabled by default, so ticking
+   files in the Commit panel works without staging them.
 3. Open the **Commit Generator** tool window on the right side, or run
    **Commit Generator: Manage Provider Profiles** from **Find Action**.
 4. Add a provider, enter the API key, and choose a model.
@@ -133,9 +133,10 @@ A ready-to-upload copy of the archive is also placed at the repository root as
 For a fully local setup, start Ollama (or LM Studio / llama.cpp / vLLM), add the matching local
 provider, and enable **Local-only mode** in the tool window or settings page.
 
-> **JetBrains staging note:** the classic Commit tool window does not stage files before commit.
-> Commit Generator mirrors the reference extension by reading the Git index for "staged changes".
-> Enable unstaged analysis, or use the Git staging area, if every change should be considered.
+> **JetBrains staging note:** checked files in the Commit panel are included in the coming
+> commit, not staged in the Git index. Commit Generator reads the checked files directly when
+> it is launched from the Commit panel. Unstaged changes are enabled by default for tool-window
+> generation too.
 
 ## Supported providers
 
@@ -168,7 +169,7 @@ Set the mode in the Commit Generator tool window or the settings page.
 Staged, unstaged, and untracked changes are independent toggles:
 
 - **Staged changes** (default on) - the Git index (`HEAD` to index).
-- **Unstaged changes** (default off) - the working tree, including merge conflicts.
+- **Unstaged changes** (default on) - the working tree, including merge conflicts.
 - **Untracked files** (default off) - files Git does not track yet.
 
 Additional controls: exclusion globs, maximum file size, maximum file count, maximum diff
@@ -212,7 +213,7 @@ Open **Settings | Tools | Commit Generator**.
 | --- | --- | --- |
 | Mode | `smart` | Quick, Smart, or Detailed |
 | Staged changes | `true` | Include the Git index |
-| Unstaged changes | `false` | Include working-tree changes |
+| Unstaged changes | `true` | Include working-tree changes |
 | Untracked files | `false` | Include untracked files |
 | Max diff tokens | `12000` | Diff token budget |
 | Max files | `200` | Maximum files analysed |
@@ -264,7 +265,7 @@ omission is reported to you.
 | Symptom | Fix |
 | --- | --- |
 | Action is missing | Reload the IDE after installing. Enable the bundled Git plugin. |
-| "No staged changes" | Stage files, enable **Unstaged changes** in the tool window, or use **Generate Commit Message (Staged Only)** only when files are in the index. |
+| "No staged changes" | Commit Generator uses checked files when launched from the Commit panel. If you start from the tool window, enable **Unstaged changes** or choose **Analyze all pending changes**. |
 | Message is generated but not inserted | Open the **Commit** tool window and press **Insert** in Commit Generator, or run generation from the Commit panel toolbar. |
 | 401 or 403 | Re-enter the API key for the active profile. |
 | 429 or quota errors | Wait, reduce the token budget, or use another profile. |

@@ -15,10 +15,12 @@ AI output is a draft. Check:
 - that breaking-change footers are accurate,
 - that no sensitive path slipped through.
 
-## Prefer staged-only for normal use
+## Prefer the checked files
 
-The default staged-only posture matches the reference extension and keeps the message focused.
-Enable unstaged analysis only when your JetBrains workflow does not use the Git index.
+The Commit panel checkboxes are the clearest signal of what belongs in the next commit.
+Commit Generator uses those checked files directly. If you start from the tool window while
+the Commit panel is closed, the default includes staged and unstaged changes; untracked files
+are opt-in.
 
 ## Keep sensitive paths excluded
 

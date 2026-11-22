@@ -1,5 +1,6 @@
 package com.rajatmalik.commitgenerator.adapters.git
 
+import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
@@ -15,15 +16,20 @@ import com.rajatmalik.commitgenerator.core.ports.WriteOutcome
 import com.rajatmalik.commitgenerator.core.ports.WritePolicy
 import java.awt.Component
 import java.awt.Container
+import java.awt.Dialog
 import java.awt.Window
+import java.util.ArrayDeque
+import java.util.Collections
+import java.util.IdentityHashMap
 
 /**
  * The only writer of the IDE commit message field.
  *
  * IntelliJ exposes two different commit UIs (modal dialog and non-modal commit
  * tool window). This class resolves the correct [CommitMessageI] from the action
- * data context when available, otherwise walks the open windows for a commit
- * message editor. It has no access to commit/stage/amend APIs.
+ * data context when available, otherwise walks the Commit tool window and modal
+ * dialogs. Traversal is iterative and bounded: a recursive walk of the entire
+ * IDE component tree can overflow the stack in a large IDE.
  */
 class CommitMessageTarget private constructor(
     private val target: CommitMessageI,
@@ -49,7 +55,15 @@ class CommitMessageTarget private constructor(
         onEdt { target.setCommitMessage(previous) }
     }
 
+    /** Data context of the commit panel component, used for its included changes. */
+    fun dataContext(): DataContext? = onEdt {
+        (target as? Component)?.let { DataManager.getInstance().getDataContext(it) }
+    }
+
     companion object {
+        private const val MAX_COMPONENTS = 25_000
+        private const val MAX_EDITOR_COMPONENTS = 5_000
+
         fun fromDataContext(dataContext: DataContext?): CommitMessageTarget? {
             if (dataContext == null) {
                 return null
@@ -67,19 +81,21 @@ class CommitMessageTarget private constructor(
          * Commit Generator tool window. Must be called on the EDT.
          */
         fun locate(project: Project): CommitMessageTarget? {
+            // Non-modal Commit tool window.
+            ToolWindowManager.getInstance(project).getToolWindow("Commit")
+                ?.component
+                ?.let { component -> findCommitMessage(component)?.let { return wrapLocated(it) } }
+
+            // Modal commit dialog, or a commit dialog that is the active window.
             val active = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow
-            if (active != null) {
+            if (active is Dialog && active.isShowing) {
                 findCommitMessage(active)?.let { return wrapLocated(it) }
             }
             for (window in Window.getWindows()) {
-                if (!window.isShowing) {
+                if (window === active || !window.isShowing || window !is Dialog) {
                     continue
                 }
                 findCommitMessage(window)?.let { return wrapLocated(it) }
-            }
-            val toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Commit")
-            toolWindow?.component?.let { component ->
-                findCommitMessage(component)?.let { return wrapLocated(it) }
             }
             return null
         }
@@ -91,40 +107,69 @@ class CommitMessageTarget private constructor(
             }
         }
 
-        private fun findCommitMessage(component: Component): Component? {
-            if (component is CommitMessageI) {
-                return component
-            }
-            if (component is Container) {
-                for (child in component.components) {
-                    findCommitMessage(child)?.let { return it }
+        /**
+         * Iterative breadth-first search. The visited identity set protects
+         * against unusual component graphs and the cap protects against very
+         * large IDE component trees.
+         */
+        private fun findCommitMessage(root: Component): Component? {
+            val queue = ArrayDeque<Component>()
+            val visited = Collections.newSetFromMap(IdentityHashMap<Component, Boolean>())
+            queue.add(root)
+            var seen = 0
+            while (queue.isNotEmpty() && seen < MAX_COMPONENTS) {
+                val component = queue.removeFirst()
+                if (!visited.add(component)) {
+                    continue
+                }
+                seen += 1
+                if (component is CommitMessageI) {
+                    return component
+                }
+                if (component is Container) {
+                    for (child in component.components) {
+                        queue.addLast(child)
+                    }
                 }
             }
             return null
         }
 
-        private fun findEditor(component: Component): EditorTextField? {
-            if (component is EditorTextField) {
-                return component
-            }
-            if (component is Container) {
-                for (child in component.components) {
-                    findEditor(child)?.let { return it }
+        private fun findEditor(root: Component): EditorTextField? {
+            val queue = ArrayDeque<Component>()
+            val visited = Collections.newSetFromMap(IdentityHashMap<Component, Boolean>())
+            queue.add(root)
+            var seen = 0
+            while (queue.isNotEmpty() && seen < MAX_EDITOR_COMPONENTS) {
+                val component = queue.removeFirst()
+                if (!visited.add(component)) {
+                    continue
+                }
+                seen += 1
+                if (component is EditorTextField) {
+                    return component
+                }
+                if (component is Container) {
+                    for (child in component.components) {
+                        queue.addLast(child)
+                    }
                 }
             }
             return null
         }
 
         private fun <T> onEdt(action: () -> T): T {
-            if (ApplicationManager.getApplication().isDispatchThread) {
+            val application = ApplicationManager.getApplication()
+            if (application.isDispatchThread) {
                 return action()
             }
-            var result: Result<T>? = null
-            ApplicationManager.getApplication().invokeAndWait(
-                { result = runCatching(action) },
-                ModalityState.any(),
-            )
-            return result?.getOrThrow() ?: error("${Product.NAME}: commit message update was cancelled.")
+            val task = java.util.concurrent.FutureTask<T> { action() }
+            application.invokeAndWait(task, ModalityState.any())
+            return try {
+                task.get()
+            } catch (error: java.util.concurrent.ExecutionException) {
+                throw error.cause ?: error
+            }
         }
     }
 }

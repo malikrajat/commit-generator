@@ -469,7 +469,7 @@ class CommitGeneratorToolWindowPanel(private val project: Project) : JPanel(Bord
                 statusValue.text = when {
                     generating -> "Generating…"
                     service.lastResult?.writtenToCommitPanel == true -> "Inserted into the commit message field."
-                    else -> "Ready in CommitGenerator. Open the Commit tool window and choose Insert, or copy it."
+                    else -> "Ready in Commit Generator. Open the Commit tool window and choose Insert, or copy it."
                 }
             }
         } finally {

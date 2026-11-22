@@ -38,7 +38,11 @@ class GitDiffCollector(
             is CwResult.Ok -> result.value
             is CwResult.Err -> return result
         }
-        val selection = selectEntries(entries, options.selection)
+        val selection = if (options.explicitPaths != null) {
+            selectExplicitEntries(entries, options.explicitPaths, git.info.rootPath)
+        } else {
+            selectEntries(entries, options.selection)
+        }
         val globs = PROTECTED_EXCLUDES + options.excludeGlobs
         val omitted = mutableListOf<OmittedFile>()
         val accepted = mutableListOf<SelectedGitEntry>()
@@ -92,7 +96,7 @@ class GitDiffCollector(
             ChangeSet(
                 repoRoot = git.info.rootPath,
                 repoName = git.info.repoName,
-                scope = options.selection.label(),
+                scope = if (options.explicitPaths != null) ChangeScope.ALL else options.selection.label(),
                 head = git.info.head,
                 branch = git.info.branch,
                 files = files,
@@ -103,6 +107,13 @@ class GitDiffCollector(
             ),
         )
     }
+
+    /**
+     * Converts the absolute paths from the Commit panel into repository-relative
+     * paths and diffs each matched file against HEAD. This includes both staged
+     * and unstaged edits for the checked file, which is what a JetBrains commit
+     * checkbox represents.
+     */
 
     private fun readOne(item: SelectedGitEntry, options: CollectorOptions): ReadOutcome {
         val entry = item.entry

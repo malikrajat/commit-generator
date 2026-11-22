@@ -51,7 +51,7 @@ data class OutputSettings(
 
 data class ContextSettings(
     val includeStaged: Boolean = true,
-    val includeUnstaged: Boolean = false,
+    val includeUnstaged: Boolean = true,
     val includeUntracked: Boolean = false,
     val maxDiffTokens: Int = 12_000,
     val maxFiles: Int = 200,

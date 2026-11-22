@@ -34,12 +34,13 @@ Marketplace fields can be pasted without editing the technical documentation.
 
 ## Short description
 
-> AI commit messages from your staged Git diff. Works with OpenAI, Claude, Gemini,
-> DeepSeek, Ollama, and more. Keys stay in the OS keychain. Never commits.
+> AI commit messages from the files you check in the Commit panel. Works with OpenAI, Claude,
+> Gemini, DeepSeek, Ollama, and more. Keys stay in the OS keychain. Never commits.
 
 Shorter variant (for fields with a tight limit):
 
-> AI commit messages from your staged Git diff. Cloud and local models. Never commits.
+> AI commit messages from the files you check in the Commit panel. Cloud and local models.
+> Never commits.
 
 ## Tagline
 
@@ -51,7 +52,7 @@ Paste the content below into the Marketplace description field. It is valid HTML
 renders in both the light and dark Marketplace themes.
 
 ```html
-<h2>AI commit messages for JetBrains IDEs, built around your staged diff.</h2>
+<h2>AI commit messages for JetBrains IDEs, built around the files you check in the Commit panel.</h2>
 
 <p>Commit Generator reads the changes you selected, asks your model for a
 Conventional Commit message, and writes it into the IDE commit message field. You review,

@@ -87,7 +87,7 @@ class PreviewPayloadAction : CommitGeneratorAction("Preview Payload To Be Sent")
         !service.isGenerating && service.activeProfile() != null
 
     override fun perform(project: Project, service: CommitGeneratorProjectService, e: AnActionEvent) {
-        service.generationController.showPreview()
+        service.generationController.showPreview(e.dataContext)
     }
 }
 

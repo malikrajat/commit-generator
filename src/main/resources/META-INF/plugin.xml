@@ -5,7 +5,7 @@
     <vendor url="https://github.com/malikrajat">Rajat Malik</vendor>
 
     <description><![CDATA[
-<h2>AI commit messages for JetBrains IDEs, built around your staged diff.</h2>
+<h2>AI commit messages for JetBrains IDEs, built around the files you check in the Commit panel.</h2>
 <p>Commit Generator reads the changes you selected, asks your model for a Conventional Commit
 message, and writes it into the commit message field. You review, edit, and commit. It never
 commits for you.</p>

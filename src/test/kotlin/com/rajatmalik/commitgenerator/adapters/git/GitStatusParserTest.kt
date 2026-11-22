@@ -54,4 +54,22 @@ class GitStatusParserTest {
         assertEquals(DiffMode.HEAD, all.first { it.entry.path == "both.kt" }.mode)
         assertEquals(DiffMode.UNTRACKED, all.first { it.entry.path == "new.kt" }.mode)
     }
+
+    @Test
+    fun `checked commit files are selected against HEAD`() {
+        val entries = parseGitStatus(
+            "M  staged.kt\u0000 M unstaged.kt\u0000MM both.kt\u0000?? new.kt\u0000",
+        )
+        val root = java.nio.file.Paths.get("").toAbsolutePath().normalize().toString()
+        val checked = setOf(
+            java.nio.file.Paths.get(root, "both.kt").toString(),
+            java.nio.file.Paths.get(root, "new.kt").toString(),
+        )
+
+        val selected = selectExplicitEntries(entries, checked, root)
+
+        assertEquals(listOf("both.kt", "new.kt"), selected.map { it.entry.path })
+        assertEquals(DiffMode.HEAD, selected.first { it.entry.path == "both.kt" }.mode)
+        assertEquals(DiffMode.UNTRACKED, selected.first { it.entry.path == "new.kt" }.mode)
+    }
 }
