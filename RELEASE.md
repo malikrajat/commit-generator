@@ -33,16 +33,16 @@ Community 2026.3 to prove the plugin is product-neutral. Add newer IDEs to
 The archive is written to:
 
 ```
-build/distributions/commit-generator-1.1.0.zip
+build/distributions/commit-generator-1.0.0.zip
 ```
 
 A ready-to-upload copy is also placed at the repository root as
-`commit-generator-1.1.0.zip`.
+`commit-generator-1.0.0.zip`.
 
 Inspect the archive:
 
 ```powershell
-Expand-Archive build\distributions\commit-generator-1.1.0.zip -DestinationPath build\release-check
+Expand-Archive build\distributions\commit-generator-1.0.0.zip -DestinationPath build\release-check
 Get-ChildItem build\release-check -Recurse
 ```
 
@@ -75,7 +75,7 @@ $env:PRIVATE_KEY_PASSWORD = "<password>"
 .\gradlew.bat publishPlugin
 ```
 
-The default channel is `default`. A pre-release version such as `1.1.0-beta.1` publishes to the
+The default channel is `default`. A pre-release version such as `1.0.1-beta.1` publishes to the
 `beta` channel because of the channel mapping in `build.gradle.kts`.
 
 ## 5. Publish manually
@@ -84,7 +84,7 @@ If you prefer the web UI:
 
 1. Open <https://plugins.jetbrains.com/author/me>.
 2. Choose **Upload plugin**.
-3. Upload `build/distributions/commit-generator-1.1.0.zip`.
+3. Upload `build/distributions/commit-generator-1.0.0.zip`.
 4. Copy the fields from `MARKETPLACE.md`.
 5. Upload screenshots.
 6. Select compatible products and the build range.

@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.rajatmalik.commitgenerator</id>
     <name>Commit Generator</name>
-    <version>1.1.0</version>
+    <version>1.0.0</version>
     <vendor url="https://github.com/malikrajat">Rajat Malik</vendor>
 
     <description><![CDATA[
@@ -41,25 +41,20 @@ PhpStorm, PyCharm, GoLand, RubyMine, CLion, Rider, DataGrip, DataSpell, and Rust
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.1.0</h3>
-<ul>
-  <li>Redesigned the tool window with full-width sections, consistent left alignment,
-      and controls that stay inside the window at every width.</li>
-  <li>Improved the provider, repository, message options, privacy, and latest-message
-      sections, with clearer actions and responsive button rows.</li>
-  <li>Polished the settings page and provider profile dialogs.</li>
-  <li>Verified from WebStorm 2024.1 through WebStorm 2026.3, including the current
-      2026.3 build.</li>
-</ul>
 <h3>1.0.0</h3>
 <ul>
   <li>First release for JetBrains IDEs and WebStorm.</li>
+  <li>Responsive tool window with full-width sections, consistent left alignment, and
+      controls that stay inside the window at every width.</li>
   <li>AI commit message generation from staged, unstaged, and untracked Git changes.</li>
+  <li>Reads the files checked in the Commit panel, so commit checkboxes work without
+      staging files first.</li>
   <li>Eleven provider presets, multiple profiles, model discovery, and connection tests.</li>
   <li>Quick, Smart, and Detailed modes with token budgeting and map-reduce summaries.</li>
   <li>PasswordSafe credentials, secret redaction, sensitive-path blocking, consent tracking,
       local-only mode, and payload preview.</li>
   <li>Tool window, settings page, status bar widget, and commit-panel action.</li>
+  <li>Verified from WebStorm 2024.1 through WebStorm 2026.3, plus IntelliJ IDEA 2026.3.</li>
 </ul>
     ]]></change-notes>
 

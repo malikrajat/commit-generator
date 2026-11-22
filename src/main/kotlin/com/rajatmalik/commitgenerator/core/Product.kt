@@ -12,7 +12,7 @@ object Product {
     const val SHORT_NAME: String = "Commit Generator"
     const val DESCRIPTION: String =
         "Generate AI commit messages from the files you check in the Commit panel. Works with cloud and local models. Never commits."
-    const val VERSION: String = "1.1.0"
+    const val VERSION: String = "1.0.0"
     const val VENDOR: String = "Rajat Malik"
     const val HOMEPAGE: String = "https://github.com/malikrajat/commit-generator"
     const val SUPPORT_URL: String = "$HOMEPAGE/issues"

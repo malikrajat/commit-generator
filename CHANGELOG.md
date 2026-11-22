@@ -3,26 +3,6 @@
 All notable changes are documented here. The format follows Keep a Changelog and the
 project uses semantic versioning.
 
-## [1.1.0] - 2026-11-22
-
-### Changed
-
-- Redesigned the tool window with full-width sections, a consistent label column, and
-  left-aligned checkboxes. Controls no longer drift to the right or overflow narrow
-  sidebars.
-- Split action rows into compact groups so every button stays inside the window at any
-  width.
-- Polished the settings page and provider profile dialogs.
-- Raised the verified compatibility range through WebStorm 2026.3 and IntelliJ IDEA
-  2026.3.
-
-### Fixed
-
-- Checked files from the JetBrains Commit panel are analysed correctly, including both
-  staged and unstaged edits in each checked file.
-- Removed the recursive window traversal that could cause a `StackOverflowError` when
-  locating the commit message field.
-
 ## [1.0.0] - 2026-11-22
 
 ### Added
@@ -48,6 +28,23 @@ project uses semantic versioning.
   result details.
 - Unit, contract, security, and architecture tests.
 - Complete documentation and JetBrains Marketplace metadata.
+
+### Changed
+
+- Redesigned the tool window with full-width sections, a consistent label column, and
+  left-aligned checkboxes. Controls no longer drift to the right or overflow narrow
+  sidebars.
+- Split action rows into compact groups so every button stays inside the window at any
+  width.
+- Polished the provider profile manager.
+- Verified compatibility through WebStorm 2024.1-2026.3 and IntelliJ IDEA 2026.3.
+
+### Fixed
+
+- Checked files from the JetBrains Commit panel are analysed correctly, including both
+  staged and unstaged edits in each checked file.
+- Removed the recursive commit-message read and window traversal that could cause a
+  `StackOverflowError` when locating the commit message field.
 
 ### Security
 

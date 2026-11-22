@@ -14,7 +14,7 @@ Marketplace fields can be pasted without editing the technical documentation.
 | --- | --- |
 | Plugin name | `Commit Generator` |
 | Plugin ID | `com.rajatmalik.commitgenerator` |
-| Version | `1.1.0` |
+| Version | `1.0.0` |
 | Vendor | `Rajat Malik` |
 | Vendor URL | `https://github.com/malikrajat` |
 | Plugin home page | `https://github.com/malikrajat/commit-generator` |
@@ -29,7 +29,7 @@ Marketplace fields can be pasted without editing the technical documentation.
 | Release channel | `default` |
 | Since build | `241` (2024.1) |
 | Until build | `263.*` (2026.3) |
-| Plugin archive | `build/distributions/commit-generator-1.1.0.zip` |
+| Plugin archive | `build/distributions/commit-generator-1.0.0.zip` |
 | Plugin icon | `src/main/resources/META-INF/pluginIcon.svg` (archive), `media/plugin-icon.png` (Marketplace upload) |
 
 ## Short description
@@ -197,45 +197,36 @@ images at 1440x900 or larger, PNG, under 5 MB each.
 Do not include real API keys, private repository names, customer code, or personal data in
 screenshots. Use a synthetic demo repository.
 
-## Release notes for 1.1.0
-
-```html
-<h3>1.1.0</h3>
-<ul>
-  <li>Redesigned the tool window with full-width sections, consistent left alignment,
-      and controls that stay inside the window at every width.</li>
-  <li>Improved the provider, repository, message options, privacy, and latest-message
-      sections, with clearer actions and responsive button rows.</li>
-  <li>Polished the settings page and provider profile dialogs.</li>
-  <li>Verified from WebStorm 2024.1 through WebStorm 2026.3, plus IntelliJ IDEA 2026.3.</li>
-</ul>
-```
-
 ## Release notes for 1.0.0
 
 ```html
 <h3>1.0.0</h3>
 <ul>
   <li>First release for WebStorm and JetBrains IDEs.</li>
+  <li>Responsive tool window with full-width sections, consistent left alignment, and
+      controls that stay inside the window at every width.</li>
   <li>AI commit message generation from staged, unstaged, and untracked Git changes.</li>
+  <li>Reads the files checked in the JetBrains Commit panel, so commit checkboxes work
+      without staging files first.</li>
   <li>Eleven provider presets, multiple profiles, model discovery, and connection tests.</li>
   <li>Quick, Smart, and Detailed modes with token budgeting and map-reduce summaries.</li>
   <li>PasswordSafe credentials, secret redaction, sensitive-path blocking, consent tracking,
       local-only mode, and payload preview.</li>
   <li>Tool window, settings page, status bar widget, and commit-panel action.</li>
+  <li>Verified from WebStorm 2024.1 through WebStorm 2026.3, plus IntelliJ IDEA 2026.3.</li>
 </ul>
 ```
 
 ## Upload checklist
 
 1. Confirm `gradle.properties` and `src/main/resources/META-INF/plugin.xml` both say
-   `1.1.0`.
+   `1.0.0`.
 2. Run `.\gradlew.bat clean test buildPlugin`.
 3. Run `.\gradlew.bat verifyPluginProjectConfiguration`.
 4. Optionally run `.\gradlew.bat verifyPlugin` and fix any reported compatibility problems.
 5. Sign the ZIP with `.\gradlew.bat signPlugin` if you have JetBrains signing certificates.
 6. Open <https://plugins.jetbrains.com/author/me> and choose **Upload plugin**.
-7. Upload `build/distributions/commit-generator-1.1.0.zip`.
+7. Upload `build/distributions/commit-generator-1.0.0.zip`.
 8. Paste the name, short description, full description, tags, category, vendor, and URLs
    from this document.
 9. Upload `media/plugin-icon.png` as the plugin icon if the portal asks separately (the plugin
