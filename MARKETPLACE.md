@@ -60,10 +60,13 @@ edit, and commit. It never commits for you.</p>
 
 <h3>What it does</h3>
 <ul>
-  <li>Turns staged, unstaged, or untracked Git changes into one meaningful commit message.</li>
+  <li>Generates one meaningful commit message from the files checked in the Commit panel,
+      or from staged, unstaged, and untracked changes when started from the tool window.</li>
   <li>Works with OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter, Ollama,
       LM Studio, llama.cpp, vLLM, OpenCode, and any OpenAI-compatible endpoint.</li>
-  <li>Supports multiple provider profiles, model discovery, and connection tests.</li>
+  <li>Multiple provider profiles, model discovery, and connection tests.</li>
+  <li>Uses the files checked in the Commit panel, so JetBrains commit checkboxes work
+      without staging files with Git first.</li>
   <li>Quick, Smart, and Detailed modes with token budgeting and map-reduce analysis for
       large change sets.</li>
   <li>Conventional Commits validation, optional body, breaking-change footers, issue keys,
@@ -180,7 +183,7 @@ VCS, and bundled Git plugin. The plugin verifier reports compatibility with WebS
 Marketplace listings with screenshots convert substantially better. Capture these five
 images at 1440x900 or larger, PNG, under 5 MB each.
 
-1. **Commit panel action** - open the Commit tool window with staged changes and show the
+1. **Commit panel action** - open the Commit tool window with checked files and show the
    Commit Generator button in the message toolbar. Caption: `Generate from the Commit panel`.
 2. **Tool window** - show the provider, staged/unstaged toggles, mode, Generate button, and a
    generated Conventional Commit message. Caption: `One tool window for every control`.

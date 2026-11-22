@@ -19,6 +19,8 @@ It never commits for you.
 ## What it does
 
 - Turns a Git change set into one meaningful commit message.
+- Uses the files checked in the Commit panel, so JetBrains commit checkboxes work without
+  staging files into the Git index first.
 - Uses the AI provider and model you choose, including local models with no account.
 - Follows Conventional Commits: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`,
   `ci`, `chore`, `style`, `revert`.
@@ -166,9 +168,11 @@ Set the mode in the Commit Generator tool window or the settings page.
 
 ## Choosing what to analyse
 
-Staged, unstaged, and untracked changes are independent toggles:
+Staged, unstaged, and untracked changes are independent toggles. When generation starts from
+the Commit panel, the checked files take precedence and are diffed against `HEAD`.
 
-- **Staged changes** (default on) - the Git index (`HEAD` to index).
+- **Staged changes** (default on) - the Git index (`HEAD` to index). Used when the Commit
+  panel selection is not available.
 - **Unstaged changes** (default on) - the working tree, including merge conflicts.
 - **Untracked files** (default off) - files Git does not track yet.
 

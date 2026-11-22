@@ -9,6 +9,8 @@ project uses semantic versioning.
 
 - First release for WebStorm and JetBrains IDEs.
 - AI commit message generation from staged, unstaged, and untracked Git changes.
+- Reads the files checked in the JetBrains Commit panel, so commit checkboxes work without
+  staging files into the Git index first.
 - Eleven provider presets: DeepSeek, OpenAI, Anthropic, Google Gemini, OpenRouter, Ollama,
   LM Studio, llama.cpp, vLLM, OpenCode, and custom OpenAI-compatible endpoints.
 - Multiple provider profiles, model discovery, manual model entry, connection tests, and

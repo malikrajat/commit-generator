@@ -128,7 +128,9 @@ used:
 The architecture test rejects `GitCommand.ADD`, `COMMIT`, `RESET`, `RESTORE`, `CHECKOUT`,
 `MERGE`, `REBASE`, `STASH`, `UPDATE_INDEX`, `UPDATE_REF`, `RM`, and `MV`.
 
-Staged, unstaged, and untracked changes are selected independently:
+Staged, unstaged, and untracked changes are selected independently. When generation starts
+from the Commit panel, the files checked there take precedence and are diffed against `HEAD`,
+so both staged and unstaged edits in a checked file are included.
 
 - staged: `git diff --cached`
 - unstaged: `git diff` (including conflicts)

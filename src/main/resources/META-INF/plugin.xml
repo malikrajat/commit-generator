@@ -12,7 +12,8 @@ commits for you.</p>
 
 <h3>What it does</h3>
 <ul>
-  <li>Generates one meaningful commit message from staged, unstaged, or untracked changes.</li>
+  <li>Generates one meaningful commit message from the files checked in the Commit panel,
+      or from staged, unstaged, and untracked changes when started from the tool window.</li>
   <li>Works with OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter, Ollama,
       LM Studio, llama.cpp, vLLM, OpenCode, and any OpenAI-compatible endpoint.</li>
   <li>Supports multiple provider profiles and model discovery.</li>
