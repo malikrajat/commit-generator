@@ -114,7 +114,7 @@ The plugin declares `since-build="241"` and `until-build="263.*"`, which means:
   and the other JetBrains IDEs.
 
 It is not WebStorm-only. The plugin depends only on the platform, VCS, and bundled Git
-plugin, so it loads in any IntelliJ Platform IDE that ships Git. The 1.0.0 build is
+plugin, so it loads in any IntelliJ Platform IDE that ships Git. The 1.1.0 build is
 verified against WebStorm 2024.1, 2025.1, 2026.1, 2026.3, and IntelliJ IDEA 2026.3.
 
 ## Installation
@@ -130,11 +130,11 @@ verified against WebStorm 2024.1, 2025.1, 2026.1, 2026.3, and IntelliJ IDEA 2026
 1. Build the plugin with `.\gradlew.bat buildPlugin` or download a release.
 2. Open **Settings | Plugins**.
 3. Click the gear icon and choose **Install Plugin from Disk...**.
-4. Select `commit-generator-1.0.0.zip`.
+4. Select `commit-generator-1.1.0.zip`.
 5. Restart the IDE.
 
 A ready-to-upload copy of the archive is also placed at the repository root as
-`commit-generator-1.0.0.zip`.
+`commit-generator-1.1.0.zip`.
 
 ## Quick start
 

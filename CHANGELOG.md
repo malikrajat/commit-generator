@@ -3,11 +3,11 @@
 All notable changes are documented here. The format follows Keep a Changelog and the
 project uses semantic versioning.
 
-## [1.0.0] - 2026-11-22
+## [1.1.0] - 2026-11-22
 
 ### Added
 
-- First release for WebStorm and JetBrains IDEs.
+- Release 1.1.0 for WebStorm and JetBrains IDEs.
 - AI commit message generation from staged, unstaged, and untracked Git changes.
 - Reads the files checked in the JetBrains Commit panel, so commit checkboxes work without
   staging files into the Git index first.

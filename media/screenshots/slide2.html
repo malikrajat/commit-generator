@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Commit Generator - Screenshot 2</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="canvas">
+    <div class="grid"></div>
+    <div class="glow"></div>
+
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 3v5.2A3.8 3.8 0 0 0 7.8 12H12" stroke="#A78BFA" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="4" cy="2.5" r="1.5" fill="#A78BFA"/>
+          <circle cx="4" cy="8.5" r="1.5" fill="#7C3AED"/>
+          <circle cx="12.5" cy="12" r="1.5" fill="#8B5CF6"/>
+          <path d="M11.5 2.2l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#F59E0B"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Commit Generator</div>
+        <div class="brand-sub">AI commit messages for JetBrains IDEs</div>
+      </div>
+      <div class="version-pill">v1.1.0</div>
+    </div>
+
+    <div class="hero">
+      <h1>Review the message <span class="accent">before you commit.</span></h1>
+      <p>A Conventional Commit with the right type, scope, body, and breaking-change footer.
+        Copy it, insert it into the commit field, or regenerate until it sounds right.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Grounded in your diff.</b> The message reflects the files that are actually included.</div>
+        </div>
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Conventional Commits built in.</b> Type, scope, subject length, body, and issue keys.</div>
+        </div>
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Nothing is committed for you.</b> Copy, insert, undo, or discard from the tool window.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="providers">Works with <span>OpenAI</span> · <span>Claude</span> · <span>Gemini</span> · <span>DeepSeek</span> · <span>Ollama</span> · <span>LM Studio</span></div>
+
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">Commit Generator</span>
+        <span class="layout-icons">⌘ ⋯</span>
+      </div>
+
+      <div class="tool-head">
+        <div class="tool-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 3v5.2A3.8 3.8 0 0 0 7.8 12H12" stroke="#A78BFA" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="4" cy="2.5" r="1.5" fill="#A78BFA"/>
+            <circle cx="4" cy="8.5" r="1.5" fill="#7C3AED"/>
+            <circle cx="12.5" cy="12" r="1.5" fill="#8B5CF6"/>
+            <path d="M11.5 2.2l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#F59E0B"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Commit Generator</h2>
+          <div class="sub">AI commit messages from your checked changes.<br>Review, then commit. Nothing is staged automatically.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="card" style="display:flex; align-items:center; gap:10px; padding-top:9px; padding-bottom:9px;">
+          <div style="flex:1;">
+            <div class="provider-name" style="font-size:11.5px;">Ollama (local) <span style="color:#8f929b;font-weight:400;">/ qwen2.5:7b</span></div>
+            <div class="provider-meta">rents-collections · main · read-only Git</div>
+          </div>
+          <span class="privacy-chip"><span class="dot"></span>4 files checked</span>
+        </div>
+
+        <div class="card result-card">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <h3>Latest message</h3>
+            <span class="active-tag" style="margin-left:auto;">CONVENTIONAL COMMIT</span>
+          </div>
+          <div class="desc">Review before inserting into the commit field.</div>
+          <div class="body">
+            <div class="stat-line">
+              <span class="stat">4 files</span>
+              <span class="stat">Smart</span>
+              <span class="stat">~1,840 tokens</span>
+              <span class="stat">620 ms</span>
+            </div>
+
+            <div class="commit-box"><span class="type">feat</span><span class="scope">(commit)</span>: analyze files checked in the Commit panel
+
+<span class="body-text">Read the included changes directly from the commit workflow and
+diff each checked file against HEAD. This keeps the generated
+message aligned with what will actually be committed.</span>
+
+<span class="footer">Refs: CG-142</span></div>
+
+            <div class="warning"><span class="warn-icon">!</span>1 file was excluded by sensitive-file rules.</div>
+
+            <div class="result-actions">
+              <button class="btn">Copy</button>
+              <button class="btn" style="border-color:rgba(139,92,246,.42);background:rgba(124,58,237,.16);color:#ddd2ff;">Insert</button>
+              <button class="btn">Details</button>
+              <button class="btn" style="margin-left:auto;">Regenerate</button>
+            </div>
+
+            <div class="status-line"><span class="status-dot"></span>Inserted into the commit message field.<span class="inserted">INSERTED</span></div>
+          </div>
+        </div>
+
+        <div class="footer-note">The generated text is written to the commit field. You review and commit.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

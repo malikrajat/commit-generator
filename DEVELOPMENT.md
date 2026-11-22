@@ -20,7 +20,7 @@ On Windows:
 .\gradlew.bat buildPlugin
 ```
 
-The installable ZIP is written to `build/distributions/commit-generator-1.0.0.zip`.
+The installable ZIP is written to `build/distributions/commit-generator-1.1.0.zip`.
 
 Run a development IDE:
 

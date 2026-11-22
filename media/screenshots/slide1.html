@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Commit Generator - Screenshot 1</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="canvas">
+    <div class="grid"></div>
+    <div class="glow"></div>
+
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 3v5.2A3.8 3.8 0 0 0 7.8 12H12" stroke="#A78BFA" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="4" cy="2.5" r="1.5" fill="#A78BFA"/>
+          <circle cx="4" cy="8.5" r="1.5" fill="#7C3AED"/>
+          <circle cx="12.5" cy="12" r="1.5" fill="#8B5CF6"/>
+          <path d="M11.5 2.2l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#F59E0B"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Commit Generator</div>
+        <div class="brand-sub">AI commit messages for JetBrains IDEs</div>
+      </div>
+      <div class="version-pill">v1.1.0</div>
+    </div>
+
+    <div class="hero">
+      <h1>Commit messages from the files you <span class="accent">actually checked.</span></h1>
+      <p>Commit Generator reads the selection in your Commit panel, understands the diff,
+        and writes a Conventional Commit you can review before you commit.</p>
+
+      <div class="features">
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Uses the Commit panel selection.</b> No staging step and no guessing which files matter.</div>
+        </div>
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Quick, Smart, and Detailed modes.</b> Token-budgeted analysis for tiny fixes or large change sets.</div>
+        </div>
+        <div class="feature">
+          <div class="tick">✓</div>
+          <div><b>Never stages or commits.</b> It writes the message; you stay in control.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="providers">Works with <span>OpenAI</span> · <span>Claude</span> · <span>Gemini</span> · <span>DeepSeek</span> · <span>Ollama</span> · <span>LM Studio</span></div>
+
+    <div class="window">
+      <div class="titlebar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="title">Commit Generator</span>
+        <span class="layout-icons">⌘ ⋯</span>
+      </div>
+
+      <div class="tool-head">
+        <div class="tool-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M4 3v5.2A3.8 3.8 0 0 0 7.8 12H12" stroke="#A78BFA" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="4" cy="2.5" r="1.5" fill="#A78BFA"/>
+            <circle cx="4" cy="8.5" r="1.5" fill="#7C3AED"/>
+            <circle cx="12.5" cy="12" r="1.5" fill="#8B5CF6"/>
+            <path d="M11.5 2.2l.5 1.1 1.1.5-1.1.5-.5 1.1-.5-1.1-1.1-.5 1.1-.5z" fill="#F59E0B"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Commit Generator</h2>
+          <div class="sub">AI commit messages from your checked changes.<br>Review, then commit. Nothing is staged automatically.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="card">
+          <h3>Provider</h3>
+          <div class="desc">Profile used for the next generation.</div>
+          <div class="body">
+            <div class="provider-name">Ollama (local)</div>
+            <div class="provider-meta">Ollama / qwen2.5:7b</div>
+            <div class="btn-row">
+              <button class="btn">Switch</button>
+              <button class="btn">Add</button>
+              <button class="btn">Manage</button>
+            </div>
+            <div class="btn-row" style="margin-top:5px;">
+              <button class="btn">Test</button>
+              <button class="btn">Validate</button>
+              <button class="btn">Set key</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Repository</h3>
+          <div class="desc">Read-only Git access.</div>
+          <div class="body">
+            <div class="repo-name">rents-collections <span>/ main</span></div>
+            <div class="btn-row">
+              <button class="btn">Switch repo</button>
+              <button class="btn">Refresh</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Changes to include</h3>
+          <div class="desc">Only the selected sources are analysed.</div>
+          <div class="body">
+            <div class="check"><span class="box on"></span>Staged changes</div>
+            <div class="check"><span class="box on"></span>Unstaged changes</div>
+            <div class="check"><span class="box"></span>Untracked files</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Message options</h3>
+          <div class="desc">Depth, limits, and formatting.</div>
+          <div class="body">
+            <div class="form-row"><span>Mode</span><span class="input">Smart <span class="chev">▼</span></span></div>
+            <div class="form-row"><span>Max diff tokens</span><span class="input">12000</span></div>
+            <div class="check" style="margin-top:8px;"><span class="box on"></span>Conventional Commits</div>
+            <div class="check"><span class="box on"></span>Allow a commit body</div>
+          </div>
+        </div>
+
+        <button class="btn primary"><span class="spark">✦</span> Generate commit message</button>
+        <div class="actions-line">
+          <button class="btn">Staged only</button>
+          <button class="btn">Cancel</button>
+          <button class="btn">Undo</button>
+          <button class="btn">Preview</button>
+          <button class="btn">Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

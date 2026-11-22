@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.rajatmalik.commitgenerator</id>
     <name>Commit Generator</name>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <vendor url="https://github.com/malikrajat">Rajat Malik</vendor>
 
     <description><![CDATA[
@@ -41,9 +41,9 @@ PhpStorm, PyCharm, GoLand, RubyMine, CLion, Rider, DataGrip, DataSpell, and Rust
     ]]></description>
 
     <change-notes><![CDATA[
-<h3>1.0.0</h3>
+<h3>1.1.0</h3>
 <ul>
-  <li>First release for JetBrains IDEs and WebStorm.</li>
+  <li>Release 1.1.0 for JetBrains IDEs and WebStorm.</li>
   <li>Responsive tool window with full-width sections, consistent left alignment, and
       controls that stay inside the window at every width.</li>
   <li>AI commit message generation from staged, unstaged, and untracked Git changes.</li>
